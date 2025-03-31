@@ -1,35 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import './App.css';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import { AuthProvider } from './context/AuthContext';
+import JoinGame from './pages/JoinGame';
+
+// Import other pages - add only the ones you've actually created files for
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import CreateQuiz from './pages/CreateQuiz';
+import EditQuiz from './pages/EditQuiz';
+import PlayQuiz from './pages/PlayQuiz';
+import GameLobby from './pages/GameLobby';
+import QuizResults from './pages/QuizResults';
+import NotFound from './pages/NotFound';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <AuthProvider>
+      <div className="app">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/join" element={<JoinGame />} />
+            
+            {/* Add other routes only if you've created their components */}
+            {/* Uncomment each route after you've created its component file */}
+            
+            { <Route path="/login" element={<Login />} /> }
+            { <Route path="/register" element={<Register />} /> }
+            { <Route path="/dashboard" element={<Dashboard />} /> }
+            {<Route path="/create-quiz" element={<CreateQuiz />} /> }
+            {<Route path="/edit-quiz/:id" element={<EditQuiz />} />}
+            {/* <Route path="/play/:id" element={<PlayQuiz />} /> */}
+            {/* <Route path="/lobby/:id" element={<GameLobby />} /> */}
+            {/* <Route path="/results/:id" element={<QuizResults />} /> */}
+            {/* <Route path="/404" element={<NotFound />} /> */}
+            
+            {/* This catch-all route must always be last */}
+            <Route path="*" element={<div>Page not found</div>} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,246 @@
+.quiz-results {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .results-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+  }
+  
+  /* Results Header */
+  .results-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .results-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .quiz-title {
+    font-size: 1.2rem;
+    color: var(--text-light);
+  }
+  
+  /* Results Container */
+  .results-container {
+    background-color: var(--white);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Results Summary */
+  .results-summary {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--gray-light);
+  }
+  
+  .score-card {
+    margin-bottom: 2rem;
+  }
+  
+  .score-value {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .score-label {
+    font-size: 1.2rem;
+    color: var(--text-light);
+  }
+  
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat-label {
+    font-size: 1rem;
+    color: var(--text-light);
+  }
+  
+  /* Results Actions */
+  .results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  /* Results Details */
+  .results-details {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--gray-light);
+  }
+  
+  .results-details h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+  
+  .details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .detail-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  .detail-item.correct {
+    border-left: 4px solid var(--success);
+  }
+  
+  .detail-item.incorrect {
+    border-left: 4px solid var(--danger);
+  }
+  
+  .question-number {
+    font-weight: 600;
+    min-width: 40px;
+  }
+  
+  .answer-result {
+    flex-grow: 1;
+  }
+  
+  .answer-score {
+    font-weight: 600;
+  }
+  
+  /* Leaderboard Section */
+  .leaderboard-section {
+    margin-bottom: 2rem;
+  }
+  
+  .leaderboard-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+  
+  .leaderboard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+  }
+  
+  .spinner.small {
+    width: 30px;
+    height: 30px;
+    border-width: 3px;
+  }
+  
+  .leaderboard {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--gray-light);
+  }
+  
+  .leaderboard-header {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px;
+    background-color: var(--primary);
+    color: var(--white);
+    font-weight: 600;
+    padding: 1rem;
+  }
+  
+  .leaderboard-body {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .leaderboard-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px;
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-light);
+    transition: background-color 0.3s ease;
+  }
+  
+  .leaderboard-row:last-child {
+    border-bottom: none;
+  }
+  
+  .leaderboard-row:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  .leaderboard-row.current-player {
+    background-color: rgba(142, 68, 173, 0.05);
+    font-weight: 600;
+  }
+  
+  .leaderboard-rank {
+    text-align: center;
+  }
+  
+  .trophy {
+    font-size: 1.5rem;
+  }
+  
+  .leaderboard-score {
+    text-align: right;
+    font-weight: 600;
+  }
+  
+  /* Results Footer */
+  .results-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+  
+  /* Responsive */
+  @media (min-width: 576px) {
+    .results-actions {
+      flex-direction: row;
+      max-width: 100%;
+    }
+    
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
