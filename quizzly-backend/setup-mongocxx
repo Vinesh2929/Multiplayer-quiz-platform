@@ -1,47 +1,79 @@
 #!/bin/bash
 
-# Updated for macOS (Apple Silicon) with Homebrew
-function install_mongocxx_dependencies() {
-    echo "Installing MongoDB C++ driver dependencies for macOS..."
+# Cross-platform MongoDB C++ driver setup script
+function install_macos_deps() {
+    # Detect architecture
+    if [[ $(uname -m) == "arm64" ]]; then
+        BREW_PREFIX="/opt/homebrew"
+    else
+        BREW_PREFIX="/usr/local"
+    fi
+
+    echo "Installing MongoDB dependencies for macOS ($(uname -m))..."
     
-    # Install dependencies using Homebrew
-    brew install cmake openssl zlib
+    # Install Homebrew if missing
+    if ! command -v brew &> /dev/null; then
+        echo "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+
+    # Install dependencies with version pinning
+    brew install cmake openssl@3 zlib
+    brew install mongo-c-driver@1.24.4
+    brew install mongo-cxx-driver@3.8.0
+
+    # Configure environment variables
+    echo "Configuring environment..."
+    cat << EOF >> ~/.zshrc
+
+# MongoDB C++ Driver settings
+export LDFLAGS="-L$BREW_PREFIX/opt/mongo-c-driver@1.24.4/lib -L$BREW_PREFIX/opt/mongo-cxx-driver@3.8.0/lib"
+export CPPFLAGS="-I$BREW_PREFIX/opt/mongo-c-driver@1.24.4/include -I$BREW_PREFIX/opt/mongo-cxx-driver@3.8.0/include"
+export PKG_CONFIG_PATH="$BREW_PREFIX/opt/mongo-c-driver@1.24.4/lib/pkgconfig:$BREW_PREFIX/opt/mongo-cxx-driver@3.8.0/lib/pkgconfig:\$PKG_CONFIG_PATH"
+EOF
+
+    echo "MongoDB drivers installed to:"
+    echo "  - C Driver: $BREW_PREFIX/opt/mongo-c-driver@1.24.4"
+    echo "  - C++ Driver: $BREW_PREFIX/opt/mongo-cxx-driver@3.8.0"
+}
+
+function install_linux_deps() {
+    echo "Installing MongoDB dependencies for Linux..."
     
-    # Install MongoDB C driver (libmongoc)
-    brew install mongo-c-driver
-    
-    # Install MongoDB C++ driver (mongocxx)
-    brew install mongo-cxx-driver
-    
-    # Verify installations
-    echo "Verifying installations..."
-    brew list mongo-c-driver
-    brew list mongo-cxx-driver
-    
-    # Symlink headers to standard locations (optional)
-    echo "Creating symlinks for headers..."
-    sudo mkdir -p /usr/local/include/mongocxx/v_noabi
-    sudo mkdir -p /usr/local/include/bsoncxx/v_noabi
-    sudo ln -s $(brew --prefix mongo-cxx-driver)/include/mongocxx/v_noabi/* /usr/local/include/mongocxx/v_noabi/ || true
-    sudo ln -s $(brew --prefix mongo-cxx-driver)/include/bsoncxx/v_noabi/* /usr/local/include/bsoncxx/v_noabi/ || true
-    
-    # Symlink libraries to standard locations (optional)
-    echo "Creating symlinks for libraries..."
-    sudo mkdir -p /usr/local/lib
-    sudo ln -s $(brew --prefix mongo-c-driver)/lib/*.dylib /usr/local/lib/ || true
-    sudo ln -s $(brew --prefix mongo-cxx-driver)/lib/*.dylib /usr/local/lib/ || true
-    
-    echo "Installation complete!"
-    echo "Include paths:"
-    echo "  - $(brew --prefix mongo-cxx-driver)/include/mongocxx/v_noabi"
-    echo "  - $(brew --prefix mongo-cxx-driver)/include/bsoncxx/v_noabi"
-    echo "Library paths:"
-    echo "  - $(brew --prefix mongo-c-driver)/lib"
-    echo "  - $(brew --prefix mongo-cxx-driver)/lib"
+    if ! command -v apt-get &> /dev/null; then
+        echo "Error: This script currently only supports Debian/Ubuntu-based distributions"
+        exit 1
+    fi
+
+    sudo apt-get update
+    sudo apt-get install -y \
+        cmake \
+        libssl-dev \
+        zlib1g-dev \
+        libmongocxx-dev \
+        libbsoncxx-dev
+
+    echo "Linux dependencies installed via apt"
 }
 
 function main() {
-    install_mongocxx_dependencies
+    set -eo pipefail  # Exit on error
+    
+    echo "Starting MongoDB C++ driver setup..."
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        install_macos_deps
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        install_linux_deps
+    else
+        echo "Unsupported OS: $OSTYPE"
+        exit 1
+    fi
+
+    echo -e "\n\033[32mSetup completed successfully!\033[0m"
+    echo "Restart your terminal or run:"
+    echo "  source ~/.zshrc  # or ~/.bashrc for Linux"
+    echo "to apply environment changes"
 }
 
 main
