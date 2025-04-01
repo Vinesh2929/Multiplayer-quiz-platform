@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Updated for macOS (Apple Silicon) with Homebrew
+function install_mongocxx_dependencies() {
+    echo "Installing MongoDB C++ driver dependencies for macOS..."
+    
+    # Install dependencies using Homebrew
+    brew install cmake openssl zlib
+    
+    # Install MongoDB C driver (libmongoc)
+    brew install mongo-c-driver
+    
+    # Install MongoDB C++ driver (mongocxx)
+    brew install mongo-cxx-driver
+    
+    # Verify installations
+    echo "Verifying installations..."
+    brew list mongo-c-driver
+    brew list mongo-cxx-driver
+    
+    # Symlink headers to standard locations (optional)
+    echo "Creating symlinks for headers..."
+    sudo mkdir -p /usr/local/include/mongocxx/v_noabi
+    sudo mkdir -p /usr/local/include/bsoncxx/v_noabi
+    sudo ln -s $(brew --prefix mongo-cxx-driver)/include/mongocxx/v_noabi/* /usr/local/include/mongocxx/v_noabi/ || true
+    sudo ln -s $(brew --prefix mongo-cxx-driver)/include/bsoncxx/v_noabi/* /usr/local/include/bsoncxx/v_noabi/ || true
+    
+    # Symlink libraries to standard locations (optional)
+    echo "Creating symlinks for libraries..."
+    sudo mkdir -p /usr/local/lib
+    sudo ln -s $(brew --prefix mongo-c-driver)/lib/*.dylib /usr/local/lib/ || true
+    sudo ln -s $(brew --prefix mongo-cxx-driver)/lib/*.dylib /usr/local/lib/ || true
+    
+    echo "Installation complete!"
+    echo "Include paths:"
+    echo "  - $(brew --prefix mongo-cxx-driver)/include/mongocxx/v_noabi"
+    echo "  - $(brew --prefix mongo-cxx-driver)/include/bsoncxx/v_noabi"
+    echo "Library paths:"
+    echo "  - $(brew --prefix mongo-c-driver)/lib"
+    echo "  - $(brew --prefix mongo-cxx-driver)/lib"
+}
+
+function main() {
+    install_mongocxx_dependencies
+}
+
+main
