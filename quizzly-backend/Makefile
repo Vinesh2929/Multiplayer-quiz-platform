@@ -1,44 +1,35 @@
-# Apple Silicon (M1/M2) Makefile
-CXX       := clang++
-CXX_FLAGS := -Wall -Wextra -std=c++17 -g
+# Makefile
+CXX = clang++
+CXXFLAGS = -Wall -Wextra -std=c++17 -g \
+           -Iinclude \
+           -I/opt/homebrew/opt/mongo-cxx-driver/include/mongocxx/v_noabi \
+           -I/opt/homebrew/opt/mongo-cxx-driver/include/bsoncxx/v_noabi \
+           -I/opt/homebrew/opt/boost/include \
+           -I/opt/homebrew/opt/openssl/include
+LDFLAGS = -L/opt/homebrew/opt/mongo-cxx-driver/lib \
+          -L/opt/homebrew/opt/mongo-c-driver/lib \
+          -L/opt/homebrew/opt/boost/lib \
+          -L/opt/homebrew/opt/openssl/lib
+LDLIBS = -lmongocxx -lbsoncxx -lmongoc-1.0 -lbson-1.0 \
+         -lboost_system -lcrypto -lssl -lpthread
 
-# Direct paths from your installation
-MONGOCXX_INCLUDE := /opt/homebrew/opt/mongo-cxx-driver/include
-BSONCXX_INCLUDE  := /opt/homebrew/opt/mongo-cxx-driver/include
-MONGOCXX_LIB     := /opt/homebrew/opt/mongo-cxx-driver/lib
-MONGOC_LIB       := /opt/homebrew/opt/mongo-c-driver/lib
+SRC = src/main.cpp src/createQuiz.cpp src/register.cpp
+OBJ = $(SRC:.cpp=.o)
+TARGET = bin/main
 
-BIN       := bin
-SRC       := src/main.cpp
-SRC       := src/main.cpp src/createQuiz.cpp 
-INCLUDE   := -Iinclude \
-             -I$(MONGOCXX_INCLUDE)/mongocxx/v_noabi \
-             -I$(BSONCXX_INCLUDE)/bsoncxx/v_noabi \
-             -I/opt/homebrew/opt/boost/include \
-             -I/opt/homebrew/opt/openssl/include
+all: $(TARGET)
 
-LIBRARIES := -L$(MONGOCXX_LIB) \
-             -L$(MONGOC_LIB) \
-             -L/opt/homebrew/opt/boost/lib \
-             -L/opt/homebrew/opt/openssl/lib \
-             -lmongocxx -lbsoncxx \
-             -lmongoc-1.0 -lbson-1.0 \
-             -lboost_system \
-             -lcrypto -lssl \
-             -lpthread
+$(TARGET): $(OBJ)
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
-EXECUTABLE := main
-
-all: $(BIN)/$(EXECUTABLE)
-
-run: all
-	./$(BIN)/$(EXECUTABLE)
-
-$(BIN)/$(EXECUTABLE): $(SRC)
-	@mkdir -p $(BIN)
-	$(CXX) $(CXX_FLAGS) $(INCLUDE) $^ -o $@ $(LIBRARIES)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	-rm -rf $(BIN)
+	rm -rf bin $(OBJ)
 
-.PHONY: all run clean
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run

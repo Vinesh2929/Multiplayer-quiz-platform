@@ -1,41 +1,88 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import './AuthPages.css';
+import bcrypt from 'bcryptjs';
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { register } = useAuth();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (!name || !email || !password || !confirmPassword) {
+  
+    // Validation (unchanged)
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       return setError('Please fill in all fields');
     }
-
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       return setError('Passwords do not match');
     }
-
-    if (password.length < 6) {
+    if (formData.password.length < 6) {
       return setError('Password must be at least 6 characters');
     }
-
+  
     try {
       setLoading(true);
-      await register(name, email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Failed to create an account. Please try again.');
-      console.error(err);
+
+      const salt=await bcrypt.genSalt(10);
+      const hashedPassword=await bcrypt.hash(formData.password, salt);
+      
+      console.log("Sending registration data:", {
+        name: formData.name,
+        email: formData.email,
+        password: hashedPassword
+      });
+  
+      const response = await fetch("http://localhost:5001/api/register", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: hashedPassword
+        })
+      });
+  
+      console.log("Received response status:", response.status);
+      
+      const data = await response.json();
+      console.log("Full response data:", data);
+  
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      if (!data.success) {
+        throw new Error(data.error || "Registration failed on server");
+      }
+  
+      alert("Registration successful!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Registration error:", {
+        message: error.message,
+        stack: error.stack
+      });
+      setError(error.message || 'Failed to create an account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -57,9 +104,10 @@ const Register = () => {
             <input
               type="text"
               id="name"
+              name="name"
               className="form-control"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.name}
+              onChange={handleChange}
               placeholder="Enter your full name"
               required
             />
@@ -72,9 +120,10 @@ const Register = () => {
             <input
               type="email"
               id="email"
+              name="email"
               className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               placeholder="Enter your email"
               required
             />
@@ -87,9 +136,10 @@ const Register = () => {
             <input
               type="password"
               id="password"
+              name="password"
               className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               placeholder="Create a password"
               required
             />
@@ -102,9 +152,10 @@ const Register = () => {
             <input
               type="password"
               id="confirmPassword"
+              name="confirmPassword"
               className="form-control"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={formData.confirmPassword}
+              onChange={handleChange}
               placeholder="Confirm your password"
               required
             />
@@ -140,21 +191,6 @@ const Register = () => {
               Log In
             </Link>
           </p>
-        </div>
-
-        <div className="auth-divider">
-          <span>or sign up with</span>
-        </div>
-
-        <div className="social-login">
-          <button className="social-btn google">
-            <i className="fa fa-google"></i>
-            Google
-          </button>
-          <button className="social-btn facebook">
-            <i className="fa fa-facebook"></i>
-            Facebook
-          </button>
         </div>
       </div>
     </div>
