@@ -10,6 +10,7 @@ MONGOC_LIB       := /opt/homebrew/opt/mongo-c-driver/lib
 
 BIN       := bin
 SRC       := src/main.cpp
+SRC       := src/main.cpp src/createQuiz.cpp 
 INCLUDE   := -Iinclude \
              -I$(MONGOCXX_INCLUDE)/mongocxx/v_noabi \
              -I$(BSONCXX_INCLUDE)/bsoncxx/v_noabi \

@@ -15,8 +15,8 @@ bool createQuiz(const std::string &jsonString) {
         mongocxx::client client(uri);
 
         // Get the database and collection
-        auto db = client["quiz_database"];
-        auto collection = db["quizzes"];
+        auto db = client["Quiz_App_DB"];
+        auto collection = db["Quizzes"];
 
         // Parse the incoming JSON string into BSON
         bsoncxx::document::value quizDoc = bsoncxx::from_json(jsonString);

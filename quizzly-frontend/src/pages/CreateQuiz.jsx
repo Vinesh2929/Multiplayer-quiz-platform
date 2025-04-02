@@ -145,32 +145,64 @@ const CreateQuiz = () => {
     setQuizData({ ...quizData, questions: updatedQuestions });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     if (step === 1) {
-      // Validate basic quiz info
       if (!quizData.title.trim() || !quizData.description.trim() || !quizData.category) {
         alert('Please fill in all required fields.');
         return;
       }
-      
       setStep(2);
       return;
     }
-    
-    // For final submission - validate that we have at least one question
+  
     if (quizData.questions.length === 0) {
       alert('Your quiz needs at least one question.');
       return;
     }
-
-    // Here you would normally send data to your backend
-    console.log('Quiz data submitted:', quizData);
-    
-    // Mock saving - in a real app you'd save to backend
-    alert('Quiz created successfully!');
-    navigate('/dashboard');
+  
+    const formattedQuiz = {
+      title: quizData.title,
+      description: quizData.description,
+      category: quizData.category,
+      isPublic: quizData.isPublic,
+      timeLimit: quizData.timeLimit,
+      questions: quizData.questions.map(question => ({
+        text: question.text,
+        type: question.type,
+        options: question.options.map(option => option.text),
+        correctAnswer: question.options.findIndex(option => option.isCorrect),
+        points: question.points
+      }))
+    };
+  
+    try {
+      const response = await fetch("http://localhost:5000/api/create-quiz", {
+        method: "POST",
+        mode: "cors", // Explicitly enable CORS
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formattedQuiz)
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      
+      if (data.success) {
+        alert("Quiz created successfully!");
+        navigate("/dashboard");
+      } else {
+        alert(data.error || "Failed to create quiz");
+      }
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+      alert("Failed to connect to server. Please try again.");
+    }
   };
 
   return (

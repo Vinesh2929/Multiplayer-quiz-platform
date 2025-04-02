@@ -1,36 +1,37 @@
 #include <iostream>
 #include "httplib.h"
-#include "createQuiz.cpp"  // Include the createQuiz function
+#include "createQuiz.h"
 
 int main() {
     httplib::Server svr;
 
-    // Handle POST request to create a quiz
-    svr.Post("/api/create-quiz", [](const httplib::Request& req, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");  // Allow CORS
-        res.set_header("Content-Type", "application/json");
-
-        // Check if request body is empty
-        if (req.body.empty()) {
-            res.status = 400;
-            res.set_content(R"({"status": "error", "message": "Empty request body"})", "application/json");
-            return;
-        }
-
-        // Call createQuiz function with request JSON body
-        if (createQuiz(req.body)) {
-            res.status = 200;
-            res.set_content(R"({"status": "success", "message": "Quiz created successfully"})", "application/json");
-        } else {
-            res.status = 500;
-            res.set_content(R"({"status": "error", "message": "Failed to create quiz"})", "application/json");
-        }
+    // Set CORS headers only once (remove from set_default_headers)
+    svr.set_default_headers({
+        {"Access-Control-Allow-Methods", "GET, POST, OPTIONS"},
+        {"Access-Control-Allow-Headers", "Content-Type"}
     });
 
-    // Sample GET request for testing
+    // Handle OPTIONS requests
+    svr.Options(R"(.*)", [](const httplib::Request&, httplib::Response& res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        return 200;
+    });
+
+    // Add CORS header to each endpoint individually
     svr.Get("/api/data", [](const httplib::Request&, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         res.set_content(R"({"message": "Hello from C++ Backend!"})", "application/json");
+    });
+
+    svr.Post("/api/create-quiz", [](const httplib::Request& req, httplib::Response& res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        
+        bool success = createQuiz(req.body);
+        std::string jsonResponse = success 
+            ? R"({"success": true})" 
+            : R"({"success": false, "error": "Failed to create quiz"})";
+        
+        res.set_content(jsonResponse, "application/json");
     });
 
     std::cout << "Server is running on http://localhost:5000\n";
