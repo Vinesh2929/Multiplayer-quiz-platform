@@ -156,8 +156,14 @@ const Dashboard = () => {
                   <span>Created: {formatDate(quiz.createdAt)}</span>
                 </div>
                 <div className="quiz-actions">
-                  <Link to={`/play/${quiz.id}`} className="btn btn-sm btn-primary">
-                    Play
+                <Link 
+                  to={{
+                      pathname: `/game-lobby/${quiz.id}`,
+                      state: { quizId: quiz.id } // Pass the quiz ID as state
+                      }} 
+                    className="btn btn-sm btn-primary"
+                    >
+                     Play
                   </Link>
                   <Link to={`/edit-quiz/${quiz.id}`} className="btn btn-sm btn-outline">
                     Edit
