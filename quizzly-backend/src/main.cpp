@@ -14,11 +14,10 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/oid.hpp>
 
-// mongocxx::instance instance{};
+mongocxx::instance instance{};
 int main()
 {
-    // one global instance
-    mongocxx::instance instance{};
+    
 
     httplib::Server svr;
 

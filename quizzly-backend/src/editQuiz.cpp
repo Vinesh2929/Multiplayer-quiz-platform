@@ -10,7 +10,11 @@
 bool updateQuiz(const std::string &jsonString) {
     try {
         // Initialize MongoDB connection
-        mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/");
+        mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/"
+                             "?retryWrites=true&w=majority"
+                             "&connectTimeoutMS=10000"
+                             "&socketTimeoutMS=10000"
+                             "&serverSelectionTimeoutMS=10000");
         mongocxx::client client(uri);
         auto db = client["Quiz_App_DB"];
         auto collection = db["Quizzes"];
