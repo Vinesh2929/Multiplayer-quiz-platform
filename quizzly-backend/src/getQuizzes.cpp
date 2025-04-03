@@ -15,9 +15,9 @@ std::string getAllQuizzes() {
         // Configure connection URI with timeout options
         std::string uri_str = "mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/"
                              "?retryWrites=true&w=majority"
-                             "&connectTimeoutMS=5000"
-                             "&socketTimeoutMS=5000"
-                             "&serverSelectionTimeoutMS=5000";
+                             "&connectTimeoutMS=10000"
+                             "&socketTimeoutMS=10000"
+                             "&serverSelectionTimeoutMS=10000";
         
         mongocxx::uri uri(uri_str);
 

@@ -18,7 +18,7 @@
 int main()
 {
     // one global instance
-    // mongocxx::instance instance{};
+    mongocxx::instance instance{};
 
     httplib::Server svr;
 
@@ -36,12 +36,11 @@ int main()
             { res.set_content(R"({"message": "Hello from C++ Backend!"})", "application/json"); });
 
     // Get all quizzes endpoint
-    svr.Get("/api/quizzes", [](const httplib::Request &, httplib::Response &res)
-            {
-        std::string quizzes = getAllQuizzes();
-        res.set_content(quizzes, "application/json"); });
-
-    // Create quiz endpoint
+    svr.Get("/api/quizzes", [](const httplib::Request&, httplib::Response& res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_header("Content-Type", "application/json");
+        res.set_content(getAllQuizzes(), "application/json");
+    });
     svr.Post("/api/create-quiz", [](const httplib::Request &req, httplib::Response &res)
              {
         
