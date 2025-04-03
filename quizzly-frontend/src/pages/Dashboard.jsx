@@ -19,7 +19,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch quizzes from your C++ backend
-        const quizzesResponse = await fetch(`http://localhost:5001/api/quizzes`);
+        const quizzesResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/quizzes`);
         const quizzesData = await quizzesResponse.json();
         
         if (quizzesData.quizzes) {

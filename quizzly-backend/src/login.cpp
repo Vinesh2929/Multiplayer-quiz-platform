@@ -33,7 +33,11 @@ bool is_valid_c_string(const std::string& str) {
 
 bool loginUser(const std::string& body) {
     try {
-        mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/?retryWrites=true&w=majority&ssl=true");
+        mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/"
+                             "?retryWrites=true&w=majority"
+                             "&connectTimeoutMS=10000"
+                             "&socketTimeoutMS=10000"
+                             "&serverSelectionTimeoutMS=10000");
         mongocxx::client client(uri);
         auto db = client["Quiz_App_DB"];
         auto collection = db["accounts"];
