@@ -19,7 +19,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch quizzes from your C++ backend
-        const quizzesResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/quizzes`);
+        const quizzesResponse = await fetch(`http://localhost:5001/api/quizzes`);
         const quizzesData = await quizzesResponse.json();
         
         if (quizzesData.quizzes) {
@@ -166,8 +166,8 @@ const Dashboard = () => {
                      Play
                   </Link>
                   {/* When the user clicks "Edit," the quiz id is passed via the URL */}
-                  <Link to={`/edit-quiz/title/${encodeURIComponent(quiz.title)}`} className="btn btn-sm btn-outline">
-                    Edit
+                  <Link to={`/edit-quiz/${quiz.id}`} className="btn btn-sm btn-outline">
+                  Edit
                   </Link>
                   <button className="btn btn-sm btn-outline">Share</button>
                 </div>

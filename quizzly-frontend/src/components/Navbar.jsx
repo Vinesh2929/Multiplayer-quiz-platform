@@ -53,7 +53,7 @@ const Navbar = () => {
             </Link>
           </li>
 
-          {currentUser ? (
+  
             <>
               <li className="navbar-item">
                 <Link to="/dashboard" className="navbar-link" onClick={closeMenu}>
@@ -71,20 +71,6 @@ const Navbar = () => {
                 </button>
               </li>
             </>
-          ) : (
-            <>
-              <li className="navbar-item">
-                <Link to="/login" className="navbar-link" onClick={closeMenu}>
-                  Login
-                </Link>
-              </li>
-              <li className="navbar-item">
-                <Link to="/register" className="navbar-link" onClick={closeMenu}>
-                  Register
-                </Link>
-              </li>
-            </>
-          )}  
         </ul>
       </div>
     </nav>
