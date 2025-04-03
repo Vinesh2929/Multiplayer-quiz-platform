@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import "./EditQuiz.css";
 
 const EditQuiz = () => {
-  const { title } = useParams(); // expects /edit-quiz/title/:title
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [quizData, setQuizData] = useState({
+    id: id, // Using 'id' instead of '_id' for consistency with backend
     title: "",
     description: "",
     category: "",
@@ -18,7 +18,6 @@ const EditQuiz = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // categories reused from CreateQuiz.jsx file 
   const categories = [
     "Education",
     "Science",
@@ -34,64 +33,69 @@ const EditQuiz = () => {
     "Other",
   ];
 
-  // Load data into the input fields when 'Edit' for any quiz is selected 
   useEffect(() => {
-    fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/api/quiz/title/${encodeURIComponent(
-        title
-      )}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          console.log("Current quiz data: ", data.quiz);
-          setQuizData(data.quiz);
+    const fetchQuizData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5001/api/quiz/id/${id}`
+        );
+        const data = await response.json();
+        
+        if (data.success && data.quiz) {
+          setQuizData({
+            id: id,
+            title: data.quiz.title || "",
+            description: data.quiz.description || "",
+            category: data.quiz.category || "",
+            isPublic: data.quiz.isPublic !== false,
+            timeLimit: data.quiz.timeLimit || 30,
+            questions: data.quiz.questions || []
+          });
         } else {
-          console.error("Error loading quiz: ", data.error);
           setError(data.error || "Failed to load quiz");
         }
-      })
-      .catch((err) => {
-        console.error("Network error loading quiz:", err);
+      } catch (err) {
         setError(err.message);
-      });
-  }, [title]);
+      }
+    };
+  
+    fetchQuizData();
+  }, [id]);
 
-  // handle change in any field 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setQuizData((prev) => ({
+    setQuizData(prev => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // add a question, load fields 
   const handleAddQuestion = () => {
-    const newQuestion = {
-      text: "New question",
-      type: "multiple_choice",
-      options: ["Option 1", "Option 2", "Option 3", "Option 4"],
-      correctAnswer: 0,
-      points: 10,
-      timeLimit: 30,
-    };
-    setQuizData((prev) => ({
+    setQuizData(prev => ({
       ...prev,
-      questions: [...prev.questions, newQuestion],
+      questions: [
+        ...prev.questions,
+        {
+          text: "New question",
+          type: "multiple_choice",
+          options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+          correctAnswer: 0,
+          points: 10,
+          timeLimit: 30,
+        }
+      ]
     }));
   };
 
-  // delete a question by index 
   const handleDeleteQuestion = (index) => {
-    console.log("Deleting question at index:", index);
-    const updated = quizData.questions.filter((_, i) => i !== index);
-    setQuizData((prev) => ({ ...prev, questions: updated }));
+    setQuizData(prev => ({
+      ...prev,
+      questions: prev.questions.filter((_, i) => i !== index)
+    }));
   };
 
-  // use radio buttons to ensure only one multiple choice option is marked as correct 
   const handleCorrectAnswerChange = (questionIndex, optionIndex) => {
-    setQuizData((prev) => {
+    setQuizData(prev => {
       const updatedQuestions = [...prev.questions];
       updatedQuestions[questionIndex] = {
         ...updatedQuestions[questionIndex],
@@ -102,7 +106,7 @@ const EditQuiz = () => {
   };
 
   const handleQuestionFieldChange = (questionIndex, field, value) => {
-    setQuizData((prev) => {
+    setQuizData(prev => {
       const updatedQuestions = [...prev.questions];
       updatedQuestions[questionIndex] = {
         ...updatedQuestions[questionIndex],
@@ -113,7 +117,7 @@ const EditQuiz = () => {
   };
 
   const handleOptionChange = (questionIndex, optionIndex, value) => {
-    setQuizData((prev) => {
+    setQuizData(prev => {
       const updatedQuestions = [...prev.questions];
       const updatedOptions = [...updatedQuestions[questionIndex].options];
       updatedOptions[optionIndex] = value;
@@ -125,23 +129,18 @@ const EditQuiz = () => {
     });
   };
 
-  // call backend to update the entry in Quizzes table 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const payload = { ...quizData };
-
-    console.log("Updated quiz data: ", quizData);
-
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/edit-quiz`,
+        `http://localhost:5001/api/edit-quiz`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(quizData),
         }
       );
 
@@ -150,26 +149,25 @@ const EditQuiz = () => {
         alert("Quiz updated successfully.");
         navigate("/dashboard");
       } else {
-        console.error("Update error:", data.error);
         setError(data.error || "Failed to update quiz");
       }
     } catch (err) {
-      console.error("Network error updating quiz:", err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!quizData || !quizData.title) {
+  if (!quizData.title) {
     return <div>Loading quiz data...</div>;
   }
 
   return (
     <div className="edit-quiz-container">
       <h1>Edit Quiz</h1>
-      {error && <div className="error">{error}</div>}
+      
       <form onSubmit={handleSubmit}>
+        {/* Title Field */}
         <label>
           Title:
           <input
@@ -178,10 +176,10 @@ const EditQuiz = () => {
             value={quizData.title}
             onChange={handleChange}
             required
-            disabled
           />
         </label>
-        <br />
+
+        {/* Description Field */}
         <label>
           Description:
           <textarea
@@ -191,96 +189,81 @@ const EditQuiz = () => {
             required
           />
         </label>
-        <br />
+
+        {/* Category Select */}
         <div className="form-group">
-          <label htmlFor="category" className="form-label">
-            Category *
-          </label>
+          <label>Category *</label>
           <select
-            id="category"
             name="category"
-            className="form-control"
             value={quizData.category}
             onChange={handleChange}
             required
           >
             <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
         </div>
-        <br />
 
-        {/* Public/Private Toggle */}
+        {/* Visibility Toggle */}
         <div className="form-group">
           <label>Quiz Visibility:</label>
           <div>
             <label>
               <input
                 type="radio"
-                name="visibility"
-                value="public"
                 checked={quizData.isPublic}
-                onChange={() => setQuizData({ ...quizData, isPublic: true })}
+                onChange={() => setQuizData({...quizData, isPublic: true})}
               />
               Public
             </label>
-            <label style={{ marginLeft: "1em" }}>
+            <label>
               <input
                 type="radio"
-                name="visibility"
-                value="private"
                 checked={!quizData.isPublic}
-                onChange={() => setQuizData({ ...quizData, isPublic: false })}
+                onChange={() => setQuizData({...quizData, isPublic: false})}
               />
               Private
             </label>
           </div>
         </div>
-        <br />
 
-        {/* Questions List */}
+        {/* Questions Section */}
         <div className="questions-list">
           <h2>Questions</h2>
-          {quizData.questions && quizData.questions.length > 0 ? (
+          
+          {quizData.questions.length > 0 ? (
             <ul>
               {quizData.questions.map((question, qIndex) => (
                 <li key={qIndex} className="question-item">
+                  {/* Question Text */}
                   <div className="question-field">
                     <label>Question Text:</label>
                     <input
                       type="text"
                       value={question.text}
-                      onChange={(e) =>
-                        handleQuestionFieldChange(
-                          qIndex,
-                          "text",
-                          e.target.value
-                        )
+                      onChange={(e) => 
+                        handleQuestionFieldChange(qIndex, "text", e.target.value)
                       }
                     />
                   </div>
 
+                  {/* Time Limit */}
                   <div className="question-field">
                     <label>Time Limit (seconds):</label>
                     <input
                       type="number"
                       min="5"
                       max="300"
-                      value={question.timeLimit ?? 30}
-                      onChange={(e) =>
-                        handleQuestionFieldChange(
-                          qIndex,
-                          "timeLimit",
-                          Number(e.target.value)
-                        )
+                      value={question.timeLimit || 30}
+                      onChange={(e) => 
+                        handleQuestionFieldChange(qIndex, "timeLimit", Number(e.target.value))
                       }
                     />
                   </div>
 
+                  {/* Points */}
                   <div className="question-field">
                     <label>Points:</label>
                     <input
@@ -288,17 +271,14 @@ const EditQuiz = () => {
                       min="10"
                       max="1000"
                       step="10"
-                      value={question.points ?? 100}
-                      onChange={(e) =>
-                        handleQuestionFieldChange(
-                          qIndex,
-                          "points",
-                          Number(e.target.value)
-                        )
+                      value={question.points || 100}
+                      onChange={(e) => 
+                        handleQuestionFieldChange(qIndex, "points", Number(e.target.value))
                       }
                     />
                   </div>
 
+                  {/* Options */}
                   <div className="options-section">
                     <label>Multiple Choice Options:</label>
                     {question.options.map((opt, optIndex) => (
@@ -306,7 +286,7 @@ const EditQuiz = () => {
                         <input
                           type="text"
                           value={opt}
-                          onChange={(e) =>
+                          onChange={(e) => 
                             handleOptionChange(qIndex, optIndex, e.target.value)
                           }
                         />
@@ -315,11 +295,11 @@ const EditQuiz = () => {
                             type="radio"
                             name={`correctOption-${qIndex}`}
                             checked={question.correctAnswer === optIndex}
-                            onChange={() =>
+                            onChange={() => 
                               handleCorrectAnswerChange(qIndex, optIndex)
                             }
                           />
-                          Save as the Answer
+                          Correct Answer
                         </label>
                       </div>
                     ))}
@@ -339,23 +319,24 @@ const EditQuiz = () => {
             <p>No questions added yet.</p>
           )}
 
-          <div id="c-button">
-            <button
-              type="button"
-              className="btn btn-add"
-              onClick={handleAddQuestion}
-            >
-              Add Question
-            </button>
-          </div>
-        </div>
-        <br />
-
-        <div className="button-group">
-          <button type="submit" className="btn btn-submit" disabled={loading}>
-            {loading ? "Updating Quiz..." : "Update Quiz"}
+          <button
+            type="button"
+            className="btn btn-add"
+            onClick={handleAddQuestion}
+          >
+            Add Question
           </button>
+        </div>
 
+        {/* Form Buttons */}
+        <div className="button-group">
+          <button 
+            type="submit" 
+            className="btn btn-submit" 
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Quiz"}
+          </button>
           <button
             type="button"
             className="btn btn-cancel"

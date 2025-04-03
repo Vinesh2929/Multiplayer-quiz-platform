@@ -92,14 +92,35 @@ int main()
 
     // PUT endpoint to edit fields in a Quizzes table entry
     svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {
-        // update the entry in the table by quiz title 
-        bool success = updateQuiz(req.body);
-        std::string jsonResponse = success 
-            ? R"({"success": true})" 
-            : R"({"success": false, "error": "Failed to update quiz"})";
-        
-        // Set the response content type and send JSON response.
-        res.set_content(jsonResponse, "application/json");
+        try {
+            // Parse the incoming JSON using bsoncxx
+            auto doc = bsoncxx::from_json(req.body);
+            auto view = doc.view();
+            
+            // Check for either "id" or "_id" field
+            if (!view["id"] && !view["_id"]) {
+                res.set_content(
+                    R"({"success": false, "error": "Missing quiz ID in request body"})", 
+                    "application/json"
+                );
+                return;
+            }
+    
+            // Update the quiz using the ID
+            bool success = updateQuiz(req.body);
+            
+            std::string jsonResponse = success 
+                ? R"({"success": true})" 
+                : R"({"success": false, "error": "Failed to update quiz. Quiz may not exist or no changes were made."})";
+            
+            res.set_content(jsonResponse, "application/json");
+        } catch (const std::exception &e) {
+            res.set_content(
+                std::string(R"({"success": false, "error": ")") + e.what() + R"("})",
+                "application/json"
+            );
+            res.status = 400; // Bad Request
+        }
     });
 
     // User login endpoint
