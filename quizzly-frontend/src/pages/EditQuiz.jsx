@@ -18,7 +18,23 @@ const EditQuiz = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // load data into the input fields
+  // categories reused from CreateQuiz.jsx file 
+  const categories = [
+    "Education",
+    "Science",
+    "History",
+    "Geography",
+    "Entertainment",
+    "Sports",
+    "Technology",
+    "Art & Literature",
+    "Music",
+    "Movies & TV",
+    "Business",
+    "Other",
+  ];
+
+  // Load data into the input fields when 'Edit' for any quiz is selected 
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/quiz/title/${encodeURIComponent(
@@ -28,6 +44,7 @@ const EditQuiz = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
+          console.log("Current quiz data: ", data.quiz);
           setQuizData(data.quiz);
         } else {
           console.error("Error loading quiz: ", data.error);
@@ -40,6 +57,7 @@ const EditQuiz = () => {
       });
   }, [title]);
 
+  // handle change in any field 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setQuizData((prev) => ({
@@ -48,6 +66,7 @@ const EditQuiz = () => {
     }));
   };
 
+  // add a question, load fields 
   const handleAddQuestion = () => {
     const newQuestion = {
       text: "New question",
@@ -55,6 +74,7 @@ const EditQuiz = () => {
       options: ["Option 1", "Option 2", "Option 3", "Option 4"],
       correctAnswer: 0,
       points: 10,
+      timeLimit: 30,
     };
     setQuizData((prev) => ({
       ...prev,
@@ -62,13 +82,14 @@ const EditQuiz = () => {
     }));
   };
 
-  // make sure question set is not empty
-
+  // delete a question by index 
   const handleDeleteQuestion = (index) => {
+    console.log("Deleting question at index:", index);
     const updated = quizData.questions.filter((_, i) => i !== index);
     setQuizData((prev) => ({ ...prev, questions: updated }));
   };
 
+  // use radio buttons to ensure only one multiple choice option is marked as correct 
   const handleCorrectAnswerChange = (questionIndex, optionIndex) => {
     setQuizData((prev) => {
       const updatedQuestions = [...prev.questions];
@@ -104,12 +125,15 @@ const EditQuiz = () => {
     });
   };
 
+  // call backend to update the entry in Quizzes table 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     const payload = { ...quizData };
+
+    console.log("Updated quiz data: ", quizData);
 
     try {
       const response = await fetch(
@@ -154,6 +178,7 @@ const EditQuiz = () => {
             value={quizData.title}
             onChange={handleChange}
             required
+            disabled
           />
         </label>
         <br />
@@ -167,16 +192,26 @@ const EditQuiz = () => {
           />
         </label>
         <br />
-        <label>
-          Category:
-          <input
-            type="text"
+        <div className="form-group">
+          <label htmlFor="category" className="form-label">
+            Category *
+          </label>
+          <select
+            id="category"
             name="category"
+            className="form-control"
             value={quizData.category}
             onChange={handleChange}
             required
-          />
-        </label>
+          >
+            <option value="">Select a category</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
         <br />
 
         {/* Public/Private Toggle */}
@@ -206,25 +241,6 @@ const EditQuiz = () => {
           </div>
         </div>
         <br />
-
-        {/* Time Limit Field */}
-        {/*
-        <div className="form-group">
-          <label>
-            Time Limit (seconds):
-            <input
-              type="number"
-              name="timeLimit"
-              value={quizData.timeLimit}
-              onChange={handleChange}
-              min="5"
-              max="300"
-              required
-            />
-          </label>
-        </div>
-        <br />
-        */}
 
         {/* Questions List */}
         <div className="questions-list">
@@ -284,7 +300,7 @@ const EditQuiz = () => {
                   </div>
 
                   <div className="options-section">
-                    <label>Options:</label>
+                    <label>Multiple Choice Options:</label>
                     {question.options.map((opt, optIndex) => (
                       <div key={optIndex} className="option-item">
                         <input
@@ -312,7 +328,7 @@ const EditQuiz = () => {
                   <button
                     type="button"
                     className="btn btn-add"
-                    onClick={handleDeleteQuestion}
+                    onClick={() => handleDeleteQuestion(qIndex)}
                   >
                     Delete Question
                   </button>
@@ -324,13 +340,13 @@ const EditQuiz = () => {
           )}
 
           <div id="c-button">
-          <button
-            type="button"
-            className="btn btn-add"
-            onClick={handleAddQuestion}
-          >
-            Add Question
-          </button>
+            <button
+              type="button"
+              className="btn btn-add"
+              onClick={handleAddQuestion}
+            >
+              Add Question
+            </button>
           </div>
         </div>
         <br />

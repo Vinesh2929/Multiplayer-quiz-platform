@@ -192,3 +192,7 @@
     justify-content: center;
     margin-top: 1rem;
   }
+
+  input[type="radio"] {
+    margin: 5px;
+  }
