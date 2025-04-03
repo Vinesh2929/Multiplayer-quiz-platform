@@ -12,9 +12,14 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
+      closeMenu(); // Close the menu when logging out
       navigate('/login');
     } catch (error) {
       console.error('Failed to log out', error);
@@ -24,7 +29,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo">
+        <Link to="/" className="navbar-logo" onClick={closeMenu}>
           <span className="logo-text">Quizzly</span>
         </Link>
 
@@ -36,30 +41,32 @@ const Navbar = () => {
 
         <ul className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
           <li className="navbar-item">
-            <Link to="/" className="navbar-link" onClick={() => setIsMenuOpen(false)}>
+            <Link to="/" className="navbar-link" onClick={closeMenu}>
               Home
             </Link>
           </li>
           
+          {/* Common item for both logged in and out users */}
+          <li className="navbar-item">
+            <Link to="/join" className="navbar-link" onClick={closeMenu}>
+              Join Game
+            </Link>
+          </li>
+
           {currentUser ? (
             <>
               <li className="navbar-item">
-                <Link to="/dashboard" className="navbar-link" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/dashboard" className="navbar-link" onClick={closeMenu}>
                   Dashboard
                 </Link>
               </li>
               <li className="navbar-item">
-                <Link to="/create-quiz" className="navbar-link" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/create-quiz" className="navbar-link" onClick={closeMenu}>
                   Create Quiz
                 </Link>
               </li>
               <li className="navbar-item">
-                <Link to="/join" className="navbar-link" onClick={() => setIsMenuOpen(false)}>
-                  Join Game
-                </Link>
-              </li>
-              <li className="navbar-item">
-                <button className="navbar-button" onClick={handleLogout}>
+                <button className="navbar-button logout-button" onClick={handleLogout}>
                   Logout
                 </button>
               </li>
@@ -67,22 +74,17 @@ const Navbar = () => {
           ) : (
             <>
               <li className="navbar-item">
-                <Link to="/join" className="navbar-link" onClick={() => setIsMenuOpen(false)}>
-                  Join Game
-                </Link>
-              </li>
-              <li className="navbar-item">
-                <Link to="/login" className="navbar-link" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/login" className="navbar-link" onClick={closeMenu}>
                   Login
                 </Link>
               </li>
               <li className="navbar-item">
-                <Link to="/register" className="navbar-button" onClick={() => setIsMenuOpen(false)}>
-                  Sign Up
+                <Link to="/register" className="navbar-link" onClick={closeMenu}>
+                  Register
                 </Link>
               </li>
             </>
-          )}
+          )}  
         </ul>
       </div>
     </nav>
