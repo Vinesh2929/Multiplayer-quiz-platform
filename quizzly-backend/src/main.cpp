@@ -13,6 +13,7 @@
 
 
 int main() {
+    mongocxx::instance instance{};
     httplib::Server svr;
 
     // Set CORS headers

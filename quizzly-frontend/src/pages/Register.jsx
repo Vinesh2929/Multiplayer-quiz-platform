@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './AuthPages.css';
+import bcrypt from 'bcryptjs';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -25,27 +26,63 @@ const Register = () => {
     e.preventDefault();
     setError('');
   
-    if (!email || !password) {
+    // Validation (unchanged)
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       return setError('Please fill in all fields');
+    }
+    if (formData.password !== formData.confirmPassword) {
+      return setError('Passwords do not match');
+    }
+    if (formData.password.length < 6) {
+      return setError('Password must be at least 6 characters');
     }
   
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5001/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+
+      const salt=await bcrypt.genSalt(10);
+      const hashedPassword=await bcrypt.hash(formData.password, salt);
+      
+      console.log("Sending registration data:", {
+        name: formData.name,
+        email: formData.email,
+        password: hashedPassword
       });
   
-      const data = await res.json();
-      if (data.success) {
-        navigate('/dashboard');
-      } else {
-        setError(data.error || 'Failed to sign in. Please check your credentials.');
+      const response = await fetch("http://localhost:5001/api/register", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: hashedPassword
+        })
+      });
+  
+      console.log("Received response status:", response.status);
+      
+      const data = await response.json();
+      console.log("Full response data:", data);
+  
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
       }
-    } catch (err) {
-      setError('Failed to connect to server.');
-      console.error(err);
+      
+      if (!data.success) {
+        throw new Error(data.error || "Registration failed on server");
+      }
+  
+      alert("Registration successful!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Registration error:", {
+        message: error.message,
+        stack: error.stack
+      });
+      setError(error.message || 'Failed to create an account. Please try again.');
     } finally {
       setLoading(false);
     }

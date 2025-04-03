@@ -4,17 +4,58 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/opt/homebrew/Cellar/mongo-cxx-driver/4.0.0/include/mongocxx/v_noabi",
-                "/opt/homebrew/Cellar/mongo-cxx-driver/4.0.0/include/bsoncxx/v_noabi"
+                "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include",
+                "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include/mongocxx/v_noabi",
+                "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include/bsoncxx/v_noabi"
             ],
             "defines": [],
-            "macFrameworkPath": [
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
-            ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "macos-clang-arm64"
+            "intelliSenseMode": "${default}"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/quizzly-backend/include/",
+                "C:/Users/finla/OneDrive/Desktop/School/SE3313/Quizzly/**",
+                "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include/mongocxx/v_noabi",
+                "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include/bsoncxx/v_noabi"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "mergeConfigurations": false,
+            "recursiveIncludes": {
+                "reduce": "default",
+                "priority": "afterSystemIncludes",
+                "order": "depthFirst"
+            },
+           "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4

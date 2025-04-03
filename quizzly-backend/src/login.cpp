@@ -8,7 +8,6 @@
 #include <bsoncxx/builder/stream/document.hpp>
 
 bool loginUser(const std::string& body) {
-    static mongocxx::instance instance{}; 
     mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/");
     mongocxx::client client(uri);
 
