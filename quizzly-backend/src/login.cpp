@@ -1,5 +1,4 @@
 #include "login.h"
-#include <nlohmann/json.hpp>
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
@@ -7,7 +6,6 @@
 #include <mongocxx/database.hpp>
 #include <mongocxx/collection.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
-
 
 bool loginUser(const std::string& body) {
     static mongocxx::instance instance{}; 
@@ -18,9 +16,11 @@ bool loginUser(const std::string& body) {
     auto collection = db["accounts"];
 
     try {
-        auto json = nlohmann::json::parse(body);
-        std::string email = json["email"];
-        std::string password = json["password"];
+        bsoncxx::document::value doc = bsoncxx::from_json(body);
+        bsoncxx::document::view view = doc.view();
+
+        std::string email = std::string(view["email"].get_string().value);
+        std::string password = std::string(view["password"].get_string().value);
 
         bsoncxx::builder::stream::document filter_builder;
         filter_builder << "email" << email << "password" << password;

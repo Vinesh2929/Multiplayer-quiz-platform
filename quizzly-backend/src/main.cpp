@@ -27,14 +27,17 @@ int main() {
 
     svr.Post("/api/create-quiz", [](const httplib::Request& req, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        
-        bool success = createQuiz(req.body);
-        std::string jsonResponse = success 
-            ? R"({"success": true})" 
+        res.set_header("Access-Control-Allow-Headers", "Content-Type");
+    
+        bool success = createQuiz(req.body);  // <- this should return a bool
+    
+        std::string jsonResponse = success
+            ? R"({"success": true})"
             : R"({"success": false, "error": "Failed to create quiz"})";
-        
+    
         res.set_content(jsonResponse, "application/json");
     });
+    
     svr.Post("/api/register", [](const httplib::Request& req, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         

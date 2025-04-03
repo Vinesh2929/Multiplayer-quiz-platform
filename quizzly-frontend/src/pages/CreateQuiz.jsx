@@ -10,7 +10,6 @@ const CreateQuiz = () => {
     description: '',
     category: '',
     isPublic: true,
-    timeLimit: 30,
     showAnswers: true,
     randomizeQuestions: false,
     questions: []
@@ -171,6 +170,7 @@ const CreateQuiz = () => {
       questions: quizData.questions.map(question => ({
         text: question.text,
         type: question.type,
+        timeLimit: question.timeLimit,
         options: question.options.map(option => option.text),
         correctAnswer: question.options.findIndex(option => option.isCorrect),
         points: question.points
@@ -178,7 +178,7 @@ const CreateQuiz = () => {
     };
   
     try {
-      const response = await fetch("http://localhost:5000/api/create-quiz", {
+      const response = await fetch("http://localhost:5001/api/create-quiz", {
         method: "POST",
         mode: "cors", // Explicitly enable CORS
         headers: {
@@ -275,19 +275,6 @@ const CreateQuiz = () => {
                 </div>
 
                 <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="timeLimit" className="form-label">Default Time Limit (seconds)</label>
-                    <input
-                      type="number"
-                      id="timeLimit"
-                      name="timeLimit"
-                      className="form-control"
-                      value={quizData.timeLimit}
-                      onChange={handleQuizDataChange}
-                      min="5"
-                      max="300"
-                    />
-                  </div>
                 </div>
 
                 <div className="form-options">
