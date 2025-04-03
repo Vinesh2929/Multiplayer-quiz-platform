@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import { AuthProvider } from './context/AuthContext';
 import JoinGame from './pages/JoinGame';
+import GameLobby from './pages/GameLobby';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -29,6 +30,7 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create-quiz" element={<CreateQuiz />} />
+          <Route path="/game-lobby/:id" element={<GameLobby />} />
           <Route path="/edit-quiz/:id" element={<EditQuiz />} />
           <Route path="/home" element={<Home />} />
           <Route path="*" element={<div>Page not found</div>} />

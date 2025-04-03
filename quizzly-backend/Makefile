@@ -13,7 +13,7 @@ LDFLAGS = -L/opt/homebrew/opt/mongo-cxx-driver/lib \
 LDLIBS = -lmongocxx -lbsoncxx -lmongoc-1.0 -lbson-1.0 \
          -lboost_system -lcrypto -lssl -lpthread
 
-SRC = src/main.cpp src/createQuiz.cpp src/register.cpp src/login.cpp
+SRC = src/main.cpp src/createQuiz.cpp src/register.cpp src/login.cpp src/getQuizzes.cpp
 OBJ = $(SRC:.cpp=.o)
 TARGET = bin/main
 

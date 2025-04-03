@@ -4,6 +4,14 @@
 #include "register.h"
 #include "editQuiz.h"
 #include "login.h"
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/uri.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/oid.hpp>
+#include "getQuizzes.h"
+
 
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
@@ -14,7 +22,7 @@
 int main() {
     httplib::Server svr;
 
-    // Set CORS headers only once (remove from set_default_headers)
+    // Set CORS headers
     svr.set_default_headers({
         {"Access-Control-Allow-Origin", "*"},
         {"Access-Control-Allow-Methods", "GET, POST, OPTIONS"},
@@ -29,25 +37,32 @@ int main() {
         res.status = 200;
     });
 
-    // Add CORS header to each endpoint individually
+    // Test endpoint
     svr.Get("/api/data", [](const httplib::Request&, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         res.set_content(R"({"message": "Hello from C++ Backend!"})", "application/json");
     });
 
+    // Get all quizzes endpoint
+    svr.Get("/api/quizzes", [](const httplib::Request&, httplib::Response& res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        std::string quizzes = getAllQuizzes();
+        res.set_content(quizzes, "application/json");
+    });
+
+    // Create quiz endpoint
     svr.Post("/api/create-quiz", [](const httplib::Request& req, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Access-Control-Allow-Headers", "Content-Type");
-    
-        bool success = createQuiz(req.body);  // <- this should return a bool
-    
-        std::string jsonResponse = success
-            ? R"({"success": true})"
+        
+        bool success = createQuiz(req.body);
+        std::string jsonResponse = success 
+            ? R"({"success": true})" 
             : R"({"success": false, "error": "Failed to create quiz"})";
-    
+        
         res.set_content(jsonResponse, "application/json");
     });
-    
+
+    // User registration endpoint
     svr.Post("/api/register", [](const httplib::Request& req, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         
@@ -87,6 +102,8 @@ int main() {
 
     // PUT endpoint to edit fields in a Quizzes table entry 
     svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {
+    // User login endpoint
+    svr.Post("/api/login", [](const httplib::Request& req, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         bool success = updateQuiz(req.body);
         std::string jsonResponse = success 
