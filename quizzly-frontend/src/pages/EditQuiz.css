@@ -1,0 +1,194 @@
+/* EditQuiz.css */
+
+.edit-quiz-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.edit-quiz-container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.edit-quiz-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-quiz-container label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.edit-quiz-container input[type="text"],
+.edit-quiz-container input[type="number"],
+.edit-quiz-container textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gray-light);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--text);
+  background-color: var(--white);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.edit-quiz-container input:focus,
+.edit-quiz-container textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+}
+
+.edit-quiz-container .form-group {
+  margin-bottom: 1rem;
+}
+
+/* Questions List */
+.edit-quiz-container .questions-list {
+  margin-top: 1.5rem;
+}
+
+.edit-quiz-container .questions-list h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+.edit-quiz-container .questions-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.edit-quiz-container .questions-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.edit-quiz-container .questions-list li:last-child {
+  border-bottom: none;
+}
+
+.edit-quiz-container .questions-list button {
+  background-color: var(--secondary);
+  color: var(--white);
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.edit-quiz-container .questions-list button:hover {
+  background-color: var(--secondary-dark);
+}
+
+/* Button Group */
+.edit-quiz-container .button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.edit-quiz-container .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  min-width: 150px;
+}
+
+.edit-quiz-container .btn-submit {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.edit-quiz-container .btn-submit:hover {
+  background-color: var(--primary-dark);
+}
+
+.edit-quiz-container .btn-cancel {
+  background-color: var(--gray-light);
+  color: var(--text);
+}
+
+.edit-quiz-container .btn-cancel:hover {
+  background-color: var(--gray);
+}
+
+/* Error Message */
+.edit-quiz-container .error {
+  color: red;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Question Structure */
+.question-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.question-field,
+.options-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.option-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Add Question Button */
+.edit-quiz-container .btn.btn-add {
+    background-color: #3498db; /* Blue color */
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    min-width: 150px;
+    display: inline-block;
+  }
+  
+  .edit-quiz-container .btn.btn-add:hover {
+    background-color: #2980b9;
+  }
+
+  #c-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }

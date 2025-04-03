@@ -24,6 +24,11 @@ const Login = () => {
       setLoading(true);
       // Call login from AuthContext. Backend handles the verification.
       await login(email, password);
+
+      // store the current user
+      localStorage.setItem('quizzlyUser', email);
+      console.log("Current user: ", email);
+
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to log in. Please try again.');

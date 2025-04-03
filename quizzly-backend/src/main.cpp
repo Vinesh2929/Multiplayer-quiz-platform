@@ -17,6 +17,9 @@
 //mongocxx::instance instance{};
 int main()
 {
+    // one global instance 
+    //mongocxx::instance instance{};
+
     httplib::Server svr;
 
     // Set CORS headers
@@ -85,7 +88,10 @@ int main()
         } });
 
     // PUT endpoint to edit fields in a Quizzes table entry
-    svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {});
+    svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {
+
+    });
+
     // User login endpoint
     svr.Post("/api/login", [](const httplib::Request& req, httplib::Response& res) {
         bool success = loginUser(req.body);
