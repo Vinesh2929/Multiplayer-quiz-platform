@@ -8,7 +8,7 @@
 #include <chrono>
 
 // Global instance (same as createQuiz)
-static mongocxx::instance instance{};
+
 
 std::string getAllQuizzes() {
     try {
