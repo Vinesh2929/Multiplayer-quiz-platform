@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './AuthPages.css';
-import bcrypt from 'bcryptjs';
 
 const Register = () => {
   const [formData, setFormData] = useState({

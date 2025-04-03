@@ -16,80 +16,59 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call to fetch user's quizzes
-    setTimeout(() => {
-      const mockQuizzes = [
-        {
-          id: 'q1',
-          title: 'Geography Trivia',
-          description: 'Test your knowledge of world geography',
-          questions: 10,
-          plays: 156,
-          createdAt: '2025-03-15T14:22:00Z',
-          lastPlayed: '2025-03-28T09:15:00Z',
-          isPublic: true
-        },
-        {
-          id: 'q2',
-          title: 'Science Quiz',
-          description: 'Challenge yourself with science facts and discoveries',
-          questions: 15,
-          plays: 78,
-          createdAt: '2025-03-10T11:45:00Z',
-          lastPlayed: '2025-03-25T16:30:00Z',
-          isPublic: true
-        },
-        {
-          id: 'q3',
-          title: 'JavaScript Basics',
-          description: 'Test your JavaScript programming knowledge',
-          questions: 12,
-          plays: 42,
-          createdAt: '2025-03-05T08:30:00Z',
-          lastPlayed: '2025-03-22T14:00:00Z',
-          isPublic: false
+    const fetchData = async () => {
+      try {
+        // Fetch quizzes from your C++ backend
+        const quizzesResponse = await fetch('http://localhost:5001/api/quizzes');
+        const quizzesData = await quizzesResponse.json();
+        
+        if (quizzesData.quizzes) {
+          // Transform the data to match your frontend structure
+          const transformedQuizzes = quizzesData.quizzes.map(quiz => ({
+            id: quiz._id?.$oid || '', // Handle MongoDB ObjectId
+            title: quiz.title || 'Untitled Quiz',
+            description: quiz.description || '',
+            questions: quiz.questions?.length || 0,
+            plays: 0, // You'll need to add this to your backend or calculate it
+            createdAt: quiz.created_at || new Date().toISOString(),
+            lastPlayed: quiz.last_played || new Date().toISOString(),
+            isPublic: quiz.isPublic || false,
+            category: quiz.category || 'General',
+            timeLimit: quiz.timeLimit || 30
+          }));
+          
+          setQuizzes(transformedQuizzes);
+          
+          // Calculate stats based on quizzes
+          setStats({
+            totalQuizzes: transformedQuizzes.length,
+            totalPlays: transformedQuizzes.reduce((sum, quiz) => sum + quiz.plays, 0),
+            totalPlayers: 0, // You'll need to track this in your backend
+            averageScore: 0 // You'll need to track this in your backend
+          });
         }
-      ];
 
-      const mockRecentGames = [
-        {
-          id: 'g1',
-          quizId: 'q1',
-          quizTitle: 'Geography Trivia',
-          date: '2025-03-28T09:15:00Z',
-          players: 12,
-          averageScore: 78
-        },
-        {
-          id: 'g2',
-          quizId: 'q2',
-          quizTitle: 'Science Quiz',
-          date: '2025-03-25T16:30:00Z',
-          players: 8,
-          averageScore: 65
-        },
-        {
-          id: 'g3',
-          quizId: 'q3',
-          quizTitle: 'JavaScript Basics',
-          date: '2025-03-22T14:00:00Z',
-          players: 5,
-          averageScore: 82
-        }
-      ];
+        // TODO: Fetch recent games from your backend when you implement that endpoint
+        const mockRecentGames = [
+          {
+            id: 'g1',
+            quizId: quizzesData.quizzes[0]?._id?.$oid || 'q1',
+            quizTitle: quizzesData.quizzes[0]?.title || 'Sample Quiz',
+            date: new Date().toISOString(),
+            players: 0,
+            averageScore: 0
+          }
+        ];
+        
+        setRecentGames(mockRecentGames);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIsLoading(false);
+      }
+    };
 
-      const mockStats = {
-        totalQuizzes: 3,
-        totalPlays: 276,
-        totalPlayers: 185,
-        averageScore: 75
-      };
-
-      setQuizzes(mockQuizzes);
-      setRecentGames(mockRecentGames);
-      setStats(mockStats);
-      setIsLoading(false);
-    }, 1000);
+    fetchData();
   }, []);
 
   if (isLoading) {
@@ -114,7 +93,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Welcome!</h1>
+        <h1>Welcome{currentUser?.displayName ? `, ${currentUser.displayName}` : ''}!</h1>
         <Link to="/create-quiz" className="btn btn-primary">
           Create New Quiz
         </Link>
@@ -165,10 +144,12 @@ const Dashboard = () => {
                   <span className={`quiz-status ${quiz.isPublic ? 'public' : 'private'}`}>
                     {quiz.isPublic ? 'Public' : 'Private'}
                   </span>
+                  <span className="quiz-category">{quiz.category}</span>
                 </div>
                 <p className="quiz-description">{quiz.description}</p>
                 <div className="quiz-meta">
                   <span>{quiz.questions} Questions</span>
+                  <span>{quiz.timeLimit} sec/question</span>
                   <span>{quiz.plays} Plays</span>
                 </div>
                 <div className="quiz-date">
