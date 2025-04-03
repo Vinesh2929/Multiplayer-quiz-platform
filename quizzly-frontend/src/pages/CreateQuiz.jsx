@@ -169,7 +169,6 @@ const CreateQuiz = () => {
       timeLimit: quizData.timeLimit,
       questions: quizData.questions.map(question => ({
         text: question.text,
-        type: question.type,
         timeLimit: question.timeLimit,
         options: question.options.map(option => option.text),
         correctAnswer: question.options.findIndex(option => option.isCorrect),
@@ -384,20 +383,6 @@ const CreateQuiz = () => {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="questionType" className="form-label">Question Type</label>
-                  <select
-                    id="questionType"
-                    name="type"
-                    className="form-control"
-                    value={currentQuestion.type}
-                    onChange={handleQuestionChange}
-                  >
-                    <option value="multiple">Multiple Choice</option>
-                    <option value="truefalse">True/False</option>
-                  </select>
-                </div>
-
                 <div className="form-group">
                   <label htmlFor="questionTimeLimit" className="form-label">Time Limit (seconds)</label>
                   <input

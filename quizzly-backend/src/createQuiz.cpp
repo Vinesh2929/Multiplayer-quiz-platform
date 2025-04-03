@@ -6,11 +6,12 @@
 #include <bsoncxx/json.hpp>
 #include <httplib.h> // Include httplib for API handling
 
+mongocxx::instance instance{}; 
+
 // Function to insert quiz into MongoDB
 bool createQuiz(const std::string &jsonString) {
     try {
         // Initialize MongoDB
-        static mongocxx::instance instance{}; 
         mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/");
         mongocxx::client client(uri);
 
