@@ -40,8 +40,43 @@ function install_mongocxx_dependencies() {
     echo "  - $(brew --prefix mongo-cxx-driver)/lib"
 }
 
+function install_mongocxx_dependencies_ubuntu() {
+    echo "Installing MongoDB C++ Driver dependencies for Ubuntu..."
+
+    # Step 1: Update and install system dependencies
+    sudo apt update
+    sudo apt install -y \
+        git cmake build-essential pkg-config libssl-dev libsasl2-dev \
+        libzstd-dev libsnappy-dev liblz4-dev
+
+    # Step 2: Install MongoDB C Driver (mongo-c-driver)
+    echo "Installing mongo-c-driver..."
+    git clone https://github.com/mongodb/mongo-c-driver.git
+    cd mongo-c-driver
+    mkdir build && cd build
+    cmake .. -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release
+    make -j$(nproc)
+    sudo make install
+    cd ../..
+    rm -rf mongo-c-driver
+
+    # Step 3: Install MongoDB C++ Driver (mongo-cxx-driver)
+    echo "Installing mongo-cxx-driver..."
+    git clone https://github.com/mongodb/mongo-cxx-driver.git --branch releases/stable --depth 1
+    cd mongo-cxx-driver
+    mkdir build && cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+    make -j$(nproc)
+    sudo make install
+    cd ../..
+    rm -rf mongo-cxx-driver
+
+    echo "MongoDB C++ Driver installed successfully on Ubuntu!"
+}
+
 function main() {
-    install_mongocxx_dependencies
+    # install_mongocxx_dependencies
+    install_mongocxx_dependencies_ubuntu
 }
 
 main

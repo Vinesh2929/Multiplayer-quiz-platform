@@ -38,15 +38,34 @@ const Register = () => {
         body: JSON.stringify({ email, password })
       });
   
+      console.log("Received response status:", response.status);
+      
+      const data = await response.json();
+      console.log("Full response data:", data);
+  
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      if (!data.success) {
+        console.error("Error from server: ", data);
+        throw new Error(data.error || "Registration failed on server");
+      }
+  
+      alert("Registration successful!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Registration error:", {
+        message: error.message,
+        stack: error.stack
+      });
+      setError(error.message || 'Failed to create an account. Please try again.');
       const data = await res.json();
       if (data.success) {
         navigate('/dashboard');
       } else {
         setError(data.error || 'Failed to sign in. Please check your credentials.');
       }
-    } catch (err) {
-      setError('Failed to connect to server.');
-      console.error(err);
     } finally {
       setLoading(false);
     }
