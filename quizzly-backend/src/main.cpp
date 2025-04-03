@@ -5,6 +5,7 @@
 #include "editQuiz.h"
 #include "login.h"
 #include "getQuizzes.h"
+#include "mongo_instance.h"
 
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
@@ -13,41 +14,40 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/oid.hpp>
 
-
-int main() {
-    mongocxx::instance instance{};
+//mongocxx::instance instance{};
+int main()
+{
     httplib::Server svr;
 
     // Set CORS headers
-    svr.set_default_headers({
-        {"Access-Control-Allow-Origin", "*"},
-        {"Access-Control-Allow-Methods", "GET, POST, OPTIONS"},
-        {"Access-Control-Allow-Headers", "Content-Type"}
-    });
+    svr.set_default_headers({{"Access-Control-Allow-Origin", "*"},
+                             {"Access-Control-Allow-Methods", "GET, POST, OPTIONS"},
+                             {"Access-Control-Allow-Headers", "Content-Type"}});
 
     // Handle OPTIONS requests
-    svr.Options(R"(.*)", [](const httplib::Request&, httplib::Response& res) {
+    svr.Options(R"(.*)", [](const httplib::Request &, httplib::Response &res)
+                {
         res.set_header("Access-Control-Allow-Origin", "*");
         res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         res.set_header("Access-Control-Allow-Headers", "Content-Type");
-        res.status = 200;
-    });
+        res.status = 200; });
 
     // Test endpoint
-    svr.Get("/api/data", [](const httplib::Request&, httplib::Response& res) {
+    svr.Get("/api/data", [](const httplib::Request &, httplib::Response &res)
+            {
         res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_content(R"({"message": "Hello from C++ Backend!"})", "application/json");
-    });
+        res.set_content(R"({"message": "Hello from C++ Backend!"})", "application/json"); });
 
     // Get all quizzes endpoint
-    svr.Get("/api/quizzes", [](const httplib::Request&, httplib::Response& res) {
+    svr.Get("/api/quizzes", [](const httplib::Request &, httplib::Response &res)
+            {
         res.set_header("Access-Control-Allow-Origin", "*");
         std::string quizzes = getAllQuizzes();
-        res.set_content(quizzes, "application/json");
-    });
+        res.set_content(quizzes, "application/json"); });
 
     // Create quiz endpoint
-    svr.Post("/api/create-quiz", [](const httplib::Request& req, httplib::Response& res) {
+    svr.Post("/api/create-quiz", [](const httplib::Request &req, httplib::Response &res)
+             {
         res.set_header("Access-Control-Allow-Origin", "*");
         
         bool success = createQuiz(req.body);
@@ -55,11 +55,11 @@ int main() {
             ? R"({"success": true})" 
             : R"({"success": false, "error": "Failed to create quiz"})";
         
-        res.set_content(jsonResponse, "application/json");
-    });
+        res.set_content(jsonResponse, "application/json"); });
 
     // User registration endpoint
-    svr.Post("/api/register", [](const httplib::Request& req, httplib::Response& res) {
+    svr.Post("/api/register", [](const httplib::Request &req, httplib::Response &res)
+             {
         res.set_header("Access-Control-Allow-Origin", "*");
         
         bool success = registerUser(req.body);
@@ -67,23 +67,22 @@ int main() {
             ? R"({"success": true})" 
             : R"({"success": false, "error": "Failed to register user"})";
         
-        res.set_content(jsonResponse, "application/json");
-    });
+        res.set_content(jsonResponse, "application/json"); });
 
-    // GET endpoint to fetch quiz data (called when a user wants to edit a quiz)
-    svr.Get(R"(/api/quiz/(\w+))", [](const httplib::Request &req, httplib::Response &res) {
-        std::string quizId = req.matches[1];  // captured group from regex
+    // GET quiz by title
+    svr.Get(R"(/api/quiz/title/(.+))", [](const httplib::Request &req, httplib::Response &res)
+            {
+        std::string quizTitle = req.matches[1];
         try {
-            static mongocxx::instance instance{};
+            // static mongocxx::instance instance{};
             mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/");
             mongocxx::client client(uri);
             auto db = client["Quiz_App_DB"];
             auto collection = db["Quizzes"];
 
-            bsoncxx::oid quizOid(quizId);
-            auto result = collection.find_one(bsoncxx::builder::stream::document{}
-                << "_id" << quizOid
-                << bsoncxx::builder::stream::finalize);
+            auto result = collection.find_one(
+                bsoncxx::builder::stream::document{} << "title" << quizTitle << bsoncxx::builder::stream::finalize
+            );
 
             if (result) {
                 std::string jsonStr = bsoncxx::to_json(result->view());
@@ -93,21 +92,22 @@ int main() {
             }
         } catch (const std::exception &e) {
             res.set_content(std::string(R"({"success": false, "error": ")") + e.what() + R"("})", "application/json");
-        }
-    });
+        } });
 
-    // PUT endpoint to edit fields in a Quizzes table entry 
+    // PUT endpoint to edit fields in a Quizzes table entry
     svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {});
     // User login endpoint
-    svr.Post("/api/login", [](const httplib::Request& req, httplib::Response& res) {
+    svr.Post("/api/login", [](const httplib::Request &req, httplib::Response &res)
+             {
         res.set_header("Access-Control-Allow-Origin", "*");
         bool success = updateQuiz(req.body);
         std::string jsonResponse = success 
             ? R"({"success": true})" 
             : R"({"success": false, "error": "Failed to update quiz"})";
-        res.set_content(jsonResponse, "application/json");
-    });
+        res.set_content(jsonResponse, "application/json"); });
 
     std::cout << "Server is running on http://localhost:5001\n";
     svr.listen("0.0.0.0", 5001);
+    return 0;
 }
+

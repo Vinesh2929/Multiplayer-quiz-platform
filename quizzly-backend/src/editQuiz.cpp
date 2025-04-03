@@ -21,16 +21,15 @@ bool updateQuiz(const std::string &jsonString) {
         auto view = quizDoc.view();
 
         // Expect the document to contain the quiz's _id (as a string, e.g., quiz_id)
-        if (!view["quiz_id"]) {
-            std::cerr << "Missing quiz_id field in update payload" << std::endl;
+        if (!view["title"]) {
+            std::cerr << "Missing title field in update payload" << std::endl;
             return false;
         }
-        std::string quizIdStr = std::string(view["quiz_id"].get_string().value);
-        bsoncxx::oid quizOid(quizIdStr);
-
-        // Build the filter using the _id
-        auto filter = bsoncxx::builder::stream::document{} 
-            << "_id" << quizOid 
+        std::string quizTitle = std::string(view["title"].get_string().value);
+        
+        // Filter by title instead of _id
+        auto filter = bsoncxx::builder::stream::document{}
+            << "title" << quizTitle
             << bsoncxx::builder::stream::finalize;
 
         // Build the update document using the $set operator.

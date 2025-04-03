@@ -5,6 +5,9 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include "httplib.h" // Include httplib for API handling
+#include "mongo_instance.h"
+
+//mongocxx::instance instance{}; 
 
 // Function to insert quiz into MongoDB
 bool createQuiz(const std::string &jsonString) {
