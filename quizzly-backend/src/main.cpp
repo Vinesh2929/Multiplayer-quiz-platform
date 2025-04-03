@@ -36,11 +36,12 @@ int main()
             { res.set_content(R"({"message": "Hello from C++ Backend!"})", "application/json"); });
 
     // Get all quizzes endpoint
-    svr.Get("/api/quizzes", [](const httplib::Request&, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Content-Type", "application/json");
-        res.set_content(getAllQuizzes(), "application/json");
-    });
+    svr.Get("/api/quizzes", [](const httplib::Request &, httplib::Response &res)
+            {
+        std::string quizzes = getAllQuizzes();
+        res.set_content(quizzes, "application/json"); });
+
+    // Create quiz endpoint
     svr.Post("/api/create-quiz", [](const httplib::Request &req, httplib::Response &res)
              {
         
@@ -63,18 +64,20 @@ int main()
         res.set_content(jsonResponse, "application/json"); });
 
     // GET quiz by title
-    svr.Get(R"(/api/quiz/title/(.+))", [](const httplib::Request &req, httplib::Response &res)
+    // GET quiz by ID (instead of by title)
+    svr.Get(R"(/api/quiz/id/([a-f0-9]{24}))", [](const httplib::Request &req, httplib::Response &res)
             {
-        std::string quizTitle = req.matches[1];
-        try {
-            // static mongocxx::instance instance{};
+            std::string quizId = req.matches[1];
+            try {
             mongocxx::uri uri("mongodb+srv://ngelbloo:jxdnXevSBkquhl2E@se3313-cluster.7kcvssw.mongodb.net/");
             mongocxx::client client(uri);
             auto db = client["Quiz_App_DB"];
             auto collection = db["Quizzes"];
 
+    // Convert string ID to MongoDB ObjectId
+            bsoncxx::oid oid(quizId);
             auto result = collection.find_one(
-                bsoncxx::builder::stream::document{} << "title" << quizTitle << bsoncxx::builder::stream::finalize
+            bsoncxx::builder::stream::document{} << "_id" << oid << bsoncxx::builder::stream::finalize
             );
 
             if (result) {
@@ -83,9 +86,9 @@ int main()
             } else {
                 res.set_content(R"({"success": false, "error": "Quiz not found"})", "application/json");
             }
-        } catch (const std::exception &e) {
+             } catch (const std::exception &e) {
             res.set_content(std::string(R"({"success": false, "error": ")") + e.what() + R"("})", "application/json");
-        } });
+             } });
 
     // PUT endpoint to edit fields in a Quizzes table entry
     svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {
