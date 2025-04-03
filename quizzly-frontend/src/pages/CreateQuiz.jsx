@@ -177,7 +177,7 @@ const CreateQuiz = () => {
     };
   
     try {
-      const response = await fetch("http://localhost:5001/api/create-quiz", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/create-quiz`, {
         method: "POST",
         mode: "cors", // Explicitly enable CORS
         headers: {
