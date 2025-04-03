@@ -69,7 +69,7 @@ const GameLobby = () => {
   // Fetch quiz data from backend
   const fetchQuizData = async (quizId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/quizzes/${quizId}`);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/quizzes/${quizId}`);
       if (!response.ok) throw new Error('Failed to load quiz');
       
       const data = await response.json();

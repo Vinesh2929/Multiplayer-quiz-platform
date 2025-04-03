@@ -4,20 +4,15 @@
 #include "register.h"
 #include "editQuiz.h"
 #include "login.h"
+#include "getQuizzes.h"
+
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/oid.hpp>
-#include "getQuizzes.h"
 
-
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/uri.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/json.hpp>
 
 int main() {
     httplib::Server svr;

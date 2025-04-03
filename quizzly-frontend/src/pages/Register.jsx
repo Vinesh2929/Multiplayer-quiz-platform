@@ -31,7 +31,7 @@ const Register = () => {
   
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5001/api/login', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
