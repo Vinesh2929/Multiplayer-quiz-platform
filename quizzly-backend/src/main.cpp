@@ -97,7 +97,7 @@ int main() {
     });
 
     // PUT endpoint to edit fields in a Quizzes table entry 
-    svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {
+    svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {});
     // User login endpoint
     svr.Post("/api/login", [](const httplib::Request& req, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
