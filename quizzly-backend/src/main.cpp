@@ -18,7 +18,7 @@
 int main()
 {
     // one global instance
-    // mongocxx::instance instance{};
+    mongocxx::instance instance{};
 
     httplib::Server svr;
 
