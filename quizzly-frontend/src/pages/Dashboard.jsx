@@ -166,7 +166,7 @@ const Dashboard = () => {
                      Play
                   </Link>
                   {/* When the user clicks "Edit," the quiz id is passed via the URL */}
-                  <Link to={`/edit-quiz/${quiz.id}`} className="btn btn-sm btn-outline">
+                  <Link to={`/edit-quiz/title/${encodeURIComponent(quiz.title)}`} className="btn btn-sm btn-outline">
                     Edit
                   </Link>
                   <button className="btn btn-sm btn-outline">Share</button>
