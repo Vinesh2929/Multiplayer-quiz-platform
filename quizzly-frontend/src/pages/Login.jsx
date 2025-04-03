@@ -14,22 +14,41 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     if (!email || !password) {
       return setError('Please fill in all fields');
     }
-
+  
     try {
       setLoading(true);
-      await login(email, password);
-      navigate('/dashboard');
+  
+      // First, validate with backend
+      const response = await fetch('http://localhost:5001/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        // If valid, proceed with client-side login to update context
+        await login(email, password);  // This is from useAuth
+        navigate('/dashboard');
+      } else {
+        setError(data.error || 'Invalid credentials');
+      }
     } catch (err) {
-      setError('Failed to sign in. Please check your credentials.');
+      setError('Failed to connect to server');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="auth-container">

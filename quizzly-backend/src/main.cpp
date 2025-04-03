@@ -2,6 +2,7 @@
 #include "httplib.h"
 #include "createQuiz.h"
 #include "register.h"
+#include "login.h"
 
 int main() {
     httplib::Server svr;
@@ -42,6 +43,17 @@ int main() {
             ? R"({"success": true})" 
             : R"({"success": false, "error": "Failed to register user"})";
         
+        res.set_content(jsonResponse, "application/json");
+    });
+
+    svr.Post("/api/login", [](const httplib::Request& req, httplib::Response& res) {
+        res.set_header("Access-Control-Allow-Origin", "*");
+    
+        bool success = loginUser(req.body);
+        std::string jsonResponse = success 
+            ? R"({"success": true})"
+            : R"({"success": false, "error": "Invalid credentials"})";
+    
         res.set_content(jsonResponse, "application/json");
     });
 
