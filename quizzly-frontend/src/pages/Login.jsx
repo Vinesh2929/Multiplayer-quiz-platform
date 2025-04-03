@@ -90,13 +90,13 @@ const Login = () => {
           </div>
 
           <div className="form-group auth-options">
-            <div className="remember-me">
+            {/* <div className="remember-me">
               <input type="checkbox" id="remember" />
               <label htmlFor="remember">Remember me</label>
-            </div>
-            <Link to="/forgot-password" className="forgot-password">
+            </div> */}
+            {/* <Link to="/forgot-password" className="forgot-password">
               Forgot Password?
-            </Link>
+            </Link> */}
           </div>
 
           <button 
@@ -117,11 +117,11 @@ const Login = () => {
           </p>
         </div>
 
-        <div className="auth-divider">
+        {/* <div className="auth-divider">
           <span>or continue with</span>
         </div>
 
-        <div className="social-login">
+        {/* <div className="social-login">
           <button className="social-btn google">
             <i className="fa fa-google"></i>
             Google
@@ -130,7 +130,7 @@ const Login = () => {
             <i className="fa fa-facebook"></i>
             Facebook
           </button>
-        </div>
+        </div> */} 
       </div>
     </div>
   );
