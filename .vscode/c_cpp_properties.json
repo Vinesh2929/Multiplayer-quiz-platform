@@ -33,10 +33,12 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/quizzly-backend/include/",
+                "${workspaceFolder}/quizzly-backend/include",
+                "quizzly-backend/external/libbcrypt/include/**",
                 "C:/Users/finla/OneDrive/Desktop/School/SE3313/Quizzly/**",
                 "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include/mongocxx/v_noabi",
-                "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include/bsoncxx/v_noabi"
+                "C:/Users/finla/OneDrive/Desktop/Projects/vcpkg/installed/x64-windows/include/bsoncxx/v_noabi",
+                "${workspaceFolder}/quizzly-backend/external/libbcrypt/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -52,7 +54,7 @@
                 "priority": "afterSystemIncludes",
                 "order": "depthFirst"
             },
-           "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
+            "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
             "browse": {
                 "limitSymbolsToIncludedHeaders": true
             }

@@ -1,3 +1,4 @@
+// Login.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -21,116 +22,46 @@ const Login = () => {
   
     try {
       setLoading(true);
-  
-      // First, validate with backend
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-  
-      const data = await response.json();
-  
-      if (data.success) {
-        // If valid, proceed with client-side login to update context
-        await login(email, password);  // This is from useAuth
-        navigate('/dashboard');
-      } else {
-        setError(data.error || 'Invalid credentials');
-      }
+      // Call login from AuthContext. Backend handles the verification.
+      await login(email, password);
+      navigate('/dashboard');
     } catch (err) {
-      setError('Failed to connect to server');
-      console.error(err);
+      setError(err.message || 'Failed to log in. Please try again.');
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
   };
   
-  
-
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h2 className="auth-title">Log In to Quizzly</h2>
         <p className="auth-subtitle">Welcome back! Log in to create and play quizzes.</p>
-
         {error && <div className="auth-error">{error}</div>}
-
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-            />
+            <label htmlFor="email" className="form-label">Email Address</label>
+            <input type="email" id="email" className="form-control"
+              value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email" required />
           </div>
-
           <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-            />
+            <label htmlFor="password" className="form-label">Password</label>
+            <input type="password" id="password" className="form-control"
+              value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password" required />
           </div>
-
-          <div className="form-group auth-options">
-            {/* <div className="remember-me">
-              <input type="checkbox" id="remember" />
-              <label htmlFor="remember">Remember me</label>
-            </div> */}
-            {/* <Link to="/forgot-password" className="forgot-password">
-              Forgot Password?
-            </Link> */}
-          </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary btn-block" 
-            disabled={loading}
-          >
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
             {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
-
         <div className="auth-alternative">
           <p>
             Don't have an account?{' '}
-            <Link to="/register" className="auth-link">
-              Sign Up
-            </Link>
+            <Link to="/register" className="auth-link">Sign Up</Link>
           </p>
         </div>
-
-        {/* <div className="auth-divider">
-          <span>or continue with</span>
-        </div>
-
-        {/* <div className="social-login">
-          <button className="social-btn google">
-            <i className="fa fa-google"></i>
-            Google
-          </button>
-          <button className="social-btn facebook">
-            <i className="fa fa-facebook"></i>
-            Facebook
-          </button>
-        </div> */} 
       </div>
     </div>
   );

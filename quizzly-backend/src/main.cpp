@@ -27,28 +27,22 @@ int main() {
 
     // Handle OPTIONS requests
     svr.Options(R"(.*)", [](const httplib::Request&, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        res.set_header("Access-Control-Allow-Headers", "Content-Type");
         res.status = 200;
     });
 
     // Test endpoint
     svr.Get("/api/data", [](const httplib::Request&, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
         res.set_content(R"({"message": "Hello from C++ Backend!"})", "application/json");
     });
 
     // Get all quizzes endpoint
     svr.Get("/api/quizzes", [](const httplib::Request&, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
         std::string quizzes = getAllQuizzes();
         res.set_content(quizzes, "application/json");
     });
 
     // Create quiz endpoint
     svr.Post("/api/create-quiz", [](const httplib::Request& req, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
         
         bool success = createQuiz(req.body);
         std::string jsonResponse = success 
@@ -60,7 +54,6 @@ int main() {
 
     // User registration endpoint
     svr.Post("/api/register", [](const httplib::Request& req, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
         
         bool success = registerUser(req.body);
         std::string jsonResponse = success 
@@ -100,11 +93,10 @@ int main() {
     svr.Put("/api/edit-quiz", [](const httplib::Request &req, httplib::Response &res) {});
     // User login endpoint
     svr.Post("/api/login", [](const httplib::Request& req, httplib::Response& res) {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        bool success = updateQuiz(req.body);
+        bool success = loginUser(req.body);
         std::string jsonResponse = success 
             ? R"({"success": true})" 
-            : R"({"success": false, "error": "Failed to update quiz"})";
+            : R"({"success": false, "error": "Failed to login"})";
         res.set_content(jsonResponse, "application/json");
     });
 

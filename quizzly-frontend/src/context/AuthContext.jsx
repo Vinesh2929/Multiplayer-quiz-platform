@@ -1,3 +1,4 @@
+// AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
@@ -10,7 +11,7 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is logged in on component mount
+  // On mount, load any stored user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem('quizzlyUser');
     if (storedUser) {
@@ -19,59 +20,57 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // For a real app, you would implement real authentication
-  // These are mock functions for demonstration
-  const login = async (email, password) => {
-    // Simulate API call
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (email && password) {
-          const user = {
-            id: 'user123',
-            name: 'Demo User',
-            email: email,
-            role: 'user'
-          };
-          setCurrentUser(user);
-          localStorage.setItem('quizzlyUser', JSON.stringify(user));
-          resolve(user);
-        } else {
-          reject(new Error('Invalid email or password'));
-        }
-      }, 1000);
+  // Register function: sends plaintext password to backend
+  const register = async (name, email, password) => {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password
+      })
     });
+    
+    const data = await response.json();
+    if (response.ok && data.success) {
+      // Assuming your backend returns the created user object
+      setCurrentUser(data.user);
+      localStorage.setItem('quizzlyUser', JSON.stringify(data.user));
+      return data.user;
+    } else {
+      throw new Error(data.error || 'Registration failed on server');
+    }
   };
 
-  const register = async (name, email, password) => {
-    // Simulate API call
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (name && email && password) {
-          const user = {
-            id: 'user123',
-            name: name,
-            email: email,
-            role: 'user'
-          };
-          setCurrentUser(user);
-          localStorage.setItem('quizzlyUser', JSON.stringify(user));
-          resolve(user);
-        } else {
-          reject(new Error('All fields are required'));
-        }
-      }, 1000);
+  // Login function: sends plaintext password to backend for verification
+  const login = async (email, password) => {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
     });
+    
+    const data = await response.json();
+    if (response.ok && data.success) {
+      setCurrentUser(data.user);
+      localStorage.setItem('quizzlyUser', JSON.stringify(data.user));
+      return data.user;
+    } else {
+      throw new Error(data.error || 'Login failed on server');
+    }
   };
 
   const logout = async () => {
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        setCurrentUser(null);
-        localStorage.removeItem('quizzlyUser');
-        resolve();
-      }, 300);
-    });
+    // Clear local auth state
+    setCurrentUser(null);
+    localStorage.removeItem('quizzlyUser');
   };
 
   const value = {
