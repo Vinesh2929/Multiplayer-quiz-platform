@@ -15,13 +15,9 @@ import CreateQuiz from './pages/CreateQuiz';
 import EditQuiz from './pages/EditQuiz';
 
 function AppContent() {
-  const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/register', '/'];
-  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
-
   return (
     <div className="app">
-      {!shouldHideNavbar && <Navbar />}
+      {<Navbar />}
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />

@@ -20,7 +20,7 @@ const Navbar = () => {
     try {
       await logout();
       closeMenu(); // Close the menu when logging out
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       console.error('Failed to log out', error);
     }
@@ -52,17 +52,12 @@ const Navbar = () => {
               Join Game
             </Link>
           </li>
-
-  
+          
+          {currentUser ? (
             <>
               <li className="navbar-item">
                 <Link to="/dashboard" className="navbar-link" onClick={closeMenu}>
                   Dashboard
-                </Link>
-              </li>
-              <li className="navbar-item">
-                <Link to="/create-quiz" className="navbar-link" onClick={closeMenu}>
-                  Create Quiz
                 </Link>
               </li>
               <li className="navbar-item">
@@ -71,6 +66,13 @@ const Navbar = () => {
                 </button>
               </li>
             </>
+          ) : (
+            <li className="navbar-item">
+              <Link to="/login" className="navbar-button logout-button" onClick={closeMenu}>
+                Login
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </nav>

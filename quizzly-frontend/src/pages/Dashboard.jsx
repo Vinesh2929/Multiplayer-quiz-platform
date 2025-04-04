@@ -94,9 +94,6 @@ const Dashboard = () => {
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>Welcome{currentUser?.displayName ? `, ${currentUser.displayName}` : ''}!</h1>
-        <Link to="/create-quiz" className="btn btn-primary">
-          Create New Quiz
-        </Link>
       </div>
 
       {/* Stats Overview */}

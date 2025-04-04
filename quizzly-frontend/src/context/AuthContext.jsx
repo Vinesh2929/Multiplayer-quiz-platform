@@ -15,9 +15,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedUser = localStorage.getItem('quizzlyUser');
     if (storedUser) {
-      //setCurrentUser(JSON.parse(storedUser));
-      console.log("Current user: ", storedUser);
-      setCurrentUser(storedUser);
+      setCurrentUser(/*JSON.parse(*/storedUser);
     }
     setLoading(false);
   }, []);
