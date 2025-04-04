@@ -37,7 +37,7 @@ const EditQuiz = () => {
     const fetchQuizData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/quiz/id/${id}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/quiz/id/${id}`
         );
         const data = await response.json();
         
@@ -136,7 +136,7 @@ const EditQuiz = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5001/api/edit-quiz`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/edit-quiz`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
