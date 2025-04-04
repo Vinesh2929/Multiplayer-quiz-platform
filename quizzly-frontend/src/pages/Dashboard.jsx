@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import './Dashboard.css';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import "./Dashboard.css";
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
@@ -11,7 +11,7 @@ const Dashboard = () => {
     totalQuizzes: 0,
     totalPlays: 0,
     totalPlayers: 0,
-    averageScore: 0
+    averageScore: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,51 +19,56 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // Fetch quizzes from your C++ backend
-        const quizzesResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/quizzes`);
+        const quizzesResponse = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/quizzes`
+        );
         const quizzesData = await quizzesResponse.json();
-        
+
         if (quizzesData.quizzes) {
           // Transform the data to match your frontend structure
-          const transformedQuizzes = quizzesData.quizzes.map(quiz => ({
-            id: quiz._id?.$oid || '', // Handle MongoDB ObjectId
-            title: quiz.title || 'Untitled Quiz',
-            description: quiz.description || '',
+          const transformedQuizzes = quizzesData.quizzes.map((quiz) => ({
+            id: quiz._id?.$oid || "", // Handle MongoDB ObjectId
+            title: quiz.title || "Untitled Quiz",
+            description: quiz.description || "",
             questions: quiz.questions?.length || 0,
             plays: 0, // You'll need to add this to your backend or calculate it
             createdAt: quiz.created_at || new Date().toISOString(),
             lastPlayed: quiz.last_played || new Date().toISOString(),
             isPublic: quiz.isPublic || false,
-            category: quiz.category || 'General',
-            timeLimit: quiz.timeLimit || 30
+            category: quiz.category || "General",
+            timeLimit: quiz.timeLimit || 30,
           }));
-          
+
           setQuizzes(transformedQuizzes);
-          
+
           // Calculate stats based on quizzes
           setStats({
             totalQuizzes: transformedQuizzes.length,
-            totalPlays: transformedQuizzes.reduce((sum, quiz) => sum + quiz.plays, 0),
+            totalPlays: transformedQuizzes.reduce(
+              (sum, quiz) => sum + quiz.plays,
+              0
+            ),
             totalPlayers: 0, // You'll need to track this in your backend
-            averageScore: 0 // You'll need to track this in your backend
+            averageScore: 0, // You'll need to track this in your backend
           });
         }
 
         // TODO: Fetch recent games from your backend when you implement that endpoint
         const mockRecentGames = [
           {
-            id: 'g1',
-            quizId: quizzesData.quizzes[0]?._id?.$oid || 'q1',
-            quizTitle: quizzesData.quizzes[0]?.title || 'Sample Quiz',
+            id: "g1",
+            quizId: quizzesData.quizzes[0]?._id?.$oid || "q1",
+            quizTitle: quizzesData.quizzes[0]?.title || "Sample Quiz",
             date: new Date().toISOString(),
             players: 0,
-            averageScore: 0
-          }
+            averageScore: 0,
+          },
         ];
-        
+
         setRecentGames(mockRecentGames);
         setIsLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
         setIsLoading(false);
       }
     };
@@ -83,10 +88,10 @@ const Dashboard = () => {
   // Format date for display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -138,8 +143,12 @@ const Dashboard = () => {
               <div key={quiz.id} className="quiz-card">
                 <div className="quiz-card-header">
                   <h3 className="quiz-title">{quiz.title}</h3>
-                  <span className={`quiz-status ${quiz.isPublic ? 'public' : 'private'}`}>
-                    {quiz.isPublic ? 'Public' : 'Private'}
+                  <span
+                    className={`quiz-status ${
+                      quiz.isPublic ? "public" : "private"
+                    }`}
+                  >
+                    {quiz.isPublic ? "Public" : "Private"}
                   </span>
                   <span className="quiz-category">{quiz.category}</span>
                 </div>
@@ -153,20 +162,22 @@ const Dashboard = () => {
                   <span>Created: {formatDate(quiz.createdAt)}</span>
                 </div>
                 <div className="quiz-actions">
-                <Link 
-                  to={{
+                  <Link
+                    to={{
                       pathname: `/game-lobby/${quiz.id}`,
-                      state: { quizId: quiz.id } // Pass the quiz ID as state
-                      }} 
+                      state: { quizId: quiz.id }, // Pass the quiz ID as state
+                    }}
                     className="btn btn-sm btn-primary"
-                    >
-                     Play
+                  >
+                    Play
                   </Link>
                   {/* When the user clicks "Edit," the quiz id is passed via the URL */}
-                  <Link to={`/edit-quiz/${quiz.id}`} className="btn btn-sm btn-outline">
-                  Edit
+                  <Link
+                    to={`/edit-quiz/${quiz.id}`}
+                    className="btn btn-sm btn-outline"
+                  >
+                    Edit
                   </Link>
-                  <button className="btn btn-sm btn-outline">Share</button>
                 </div>
               </div>
             ))}
@@ -217,7 +228,10 @@ const Dashboard = () => {
                     <td>{game.players}</td>
                     <td>{game.averageScore}%</td>
                     <td>
-                      <Link to={`/results/${game.id}`} className="btn btn-sm btn-outline">
+                      <Link
+                        to={`/results/${game.id}`}
+                        className="btn btn-sm btn-outline"
+                      >
                         Results
                       </Link>
                     </td>

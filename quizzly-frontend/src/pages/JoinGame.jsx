@@ -9,38 +9,37 @@ const JoinGame = () => {
   const [isJoining, setIsJoining] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (!gameCode.trim()) {
-      return setError('Please enter a game code');
-    }
-
-    if (!nickname.trim()) {
-      return setError('Please enter a nickname');
-    }
-
-    // In a real app, you would validate the game code with your backend
     setIsJoining(true);
-
-    // Simulate API call to join game
-    setTimeout(() => {
-      // For demo purposes, let's say any 6-digit code works
-      if (gameCode.length === 6 && /^\d+$/.test(gameCode)) {
-        // Store player info in session storage
-        sessionStorage.setItem('quizzlyPlayer', JSON.stringify({
-          nickname,
-          gameCode
-        }));
-        
-        // Navigate to game lobby
+  
+    if (!gameCode.trim() || !nickname.trim()) {
+      setError('Game code and nickname are required');
+      setIsJoining(false);
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/join-game`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameCode, nickname })
+      });
+  
+      const result = await response.json();
+  
+      if (result.success) {
+        sessionStorage.setItem('quizzlyPlayer', JSON.stringify({ gameCode, nickname }));
         navigate(`/lobby/${gameCode}`);
       } else {
-        setError('Invalid game code. Please check and try again.');
-        setIsJoining(false);
+        setError(result.error || 'Failed to join game');
       }
-    }, 1500);
+    } catch (err) {
+      setError('Server error: ' + err.message);
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   const handleGameCodeChange = (e) => {
