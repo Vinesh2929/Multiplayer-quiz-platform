@@ -64,7 +64,7 @@ std::string generateUniqueGameCode()
     return code; // returns a unique game code
 }
 
-// for testing, replace with dynamic behavior 
+// for testing, replace with dynamic behavior
 void runGameSession(const std::string &gameCode)
 {
     // print statement for debugging
@@ -259,49 +259,51 @@ int main()
     // Join Game endpoint (player joins an existing game)
     svr.Post("/api/join-game", [](const httplib::Request &req, httplib::Response &res)
              {
-        // each joining player enters a game code and nickname 
-        std::string gameCode = "";
-        std::string nickname = "";
-        
-        // parse the request body to retrieve gameCode and nickname 
+    std::string gameCode = "";
+    std::string nickname = "";
 
-        //can change this, just depends on format of request body when called 
-        size_t pos1 = req.body.find("\"gameCode\":");
-        if (pos1 != std::string::npos) {
-            size_t start = req.body.find("\"", pos1 + 11);
-            size_t end = req.body.find("\"", start + 1);
-            gameCode = req.body.substr(start + 1, end - start - 1);
-        }
-        size_t pos2 = req.body.find("\"nickname\":");
-        if (pos2 != std::string::npos) {
-            size_t start = req.body.find("\"", pos2 + 11);
-            size_t end = req.body.find("\"", start + 1);
-            nickname = req.body.substr(start + 1, end - start - 1);
-        }
-        if (gameCode.empty() || nickname.empty()) {
-            res.set_content(R"({"success": false, "error": "Missing game code or nickname"})", "application/json");
+    // Naive JSON parsing - change to robust JSON lib in future
+    size_t pos1 = req.body.find("\"gameCode\":");
+    if (pos1 != std::string::npos) {
+        size_t start = req.body.find("\"", pos1 + 11);
+        size_t end = req.body.find("\"", start + 1);
+        gameCode = req.body.substr(start + 1, end - start - 1);
+    }
+
+    size_t pos2 = req.body.find("\"nickname\":");
+    if (pos2 != std::string::npos) {
+        size_t start = req.body.find("\"", pos2 + 11);
+        size_t end = req.body.find("\"", start + 1);
+        nickname = req.body.substr(start + 1, end - start - 1);
+    }
+
+    // Validate both inputs
+    if (gameCode.empty() || nickname.empty()) {
+        res.set_content(R"({"success": false, "error": "Missing game code or nickname"})", "application/json");
+        return;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(activeGamesMutex);
+        if (activeGames.find(gameCode) == activeGames.end()) {
+            res.set_content(R"({"success": false, "error": "Game not found"})", "application/json");
             return;
         }
-        {
-            // find the live game by game code 
-            std::lock_guard<std::mutex> lock(activeGamesMutex);
-            if (activeGames.find(gameCode) == activeGames.end()) {
-                // if a live game with this game code cannot be found, return error 
-                res.set_content(R"({"success": false, "error": "Game not found"})", "application/json");
-                return;
-            }
-        }
-        // Simulate adding a player by creating a new thread
-        // a new thread is created with the game code and nickname retrieved, each thread represents a player 
+
+        // Create a new thread for the joining player
         std::thread joinThread([gameCode, nickname]() {
-            std::cout << "Player " << nickname << " is joining game " << gameCode 
+            std::cout << "[JOIN] Player " << nickname << " is joining game " << gameCode 
                       << " (handled in thread " << std::this_thread::get_id() << ")\n";
+
+            // Optional: simulate active presence
+            std::this_thread::sleep_for(std::chrono::seconds(60));
         });
 
-        // call detach() to detach the thread
-        // the thread will continue running in the background while th emain thread proceeds without waiting  
+        // Detach so it runs independently
         joinThread.detach();
-        res.set_content(R"({"success": true, "message": "Joined game successfully"})", "application/json"); });
+    }
+
+    res.set_content(R"({"success": true, "message": "Joined game successfully"})", "application/json"); });
 
     std::cout << "Server is running on http://localhost:5001\n";
     svr.listen("0.0.0.0", 5001);

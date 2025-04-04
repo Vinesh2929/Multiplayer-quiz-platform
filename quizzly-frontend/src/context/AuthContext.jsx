@@ -41,8 +41,11 @@ export function AuthProvider({ children }) {
     const data = await response.json();
     if (response.ok && data.success) {
       // Assuming your backend returns the created user object
-      setCurrentUser(data.user);
-      localStorage.setItem("quizzlyUser", JSON.stringify(data.user));
+
+      console.log("Response received: ", data); 
+      console.log("Current email: ", email);
+      setCurrentUser(email); // this doesn't exist
+      localStorage.setItem("quizzlyUser", JSON.stringify(email)); // this is undefined
       return data.user;
     } else {
       throw new Error(data.error || "Registration failed on server");

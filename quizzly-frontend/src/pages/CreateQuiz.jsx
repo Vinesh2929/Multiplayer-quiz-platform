@@ -163,12 +163,16 @@ const CreateQuiz = () => {
       return;
     }
 
+    const cUser = JSON.parse(localStorage.getItem("quizzlyUser"));
+    
+
     const formattedQuiz = {
       title: quizData.title,
       description: quizData.description,
       category: quizData.category,
       isPublic: quizData.isPublic,
       timeLimit: quizData.timeLimit,
+      createdBy: currentUser,
       questions: quizData.questions.map(question => ({
         text: question.text,
         timeLimit: question.timeLimit,

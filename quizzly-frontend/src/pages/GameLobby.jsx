@@ -25,50 +25,38 @@ const GameLobby = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize lobby with quiz and player data
-  useEffect(() => {
-    // Get quiz ID from navigation state
-    const { quizId } = location.state || {};
-    setQuizId(quizId);
-
-    const playerData = sessionStorage.getItem("quizzlyPlayer");
-
-    // Load player info from session storage
-    /*const storedPlayer = sessionStorage.getItem('quizzlyPlayer');
-    if (!storedPlayer) {
-      navigate('/join');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsJoining(true);
+  
+    if (!gameCode.trim() || !nickname.trim()) {
+      setError('Game code and nickname are required');
+      setIsJoining(false);
       return;
     }
-    
-    const playerData = JSON.parse(storedPlayer);
-    if (playerData.gameCode !== gameCode) {
-      navigate('/join');
-      return;
-    }*/
-
-    setPlayerNickname(playerData);
-
-    // Add current player to players list
-    setPlayers([
-      {
-        id: Date.now(),
-        nickname: playerData,
-        avatar: "😎",
-        isReady: false,
-        isYou: true,
-      },
-    ]);
-
-    // Fetch quiz data if ID exists
-    if (quizId) {
-      fetchQuizData(quizId);
-    } else {
-      setIsLoading(false);
+  
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/join-game`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameCode, nickname })
+      });
+  
+      const result = await response.json();
+  
+      if (result.success) {
+        sessionStorage.setItem('quizzlyPlayer', JSON.stringify({ gameCode, nickname }));
+        navigate(`/lobby/${gameCode}`);
+      } else {
+        setError(result.error || 'Failed to join game');
+      }
+    } catch (err) {
+      setError('Server error: ' + err.message);
+    } finally {
+      setIsJoining(false);
     }
-
-    // Start player polling
-    const interval = setInterval(updatePlayers, 3000);
-    return () => clearInterval(interval);
-  }, [gameCode, navigate, location.state]);
+  };
 
   // Fetch quiz data from backend
   const fetchQuizData = async (quizId) => {
