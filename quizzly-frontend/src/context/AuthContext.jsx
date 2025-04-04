@@ -1,5 +1,5 @@
 // AuthContext.jsx
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
 
   // On mount, load any stored user from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem('quizzlyUser');
+    const storedUser = localStorage.getItem("quizzlyUser");
     if (storedUser) {
       //setCurrentUser(JSON.parse(storedUser));
       console.log("Current user: ", storedUser);
@@ -24,55 +24,62 @@ export function AuthProvider({ children }) {
 
   // Register function: sends plaintext password to backend
   const register = async (name, email, password) => {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        password
-      })
-    });
-    
+    const response = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/register`,
+      {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      }
+    );
+
     const data = await response.json();
     if (response.ok && data.success) {
       // Assuming your backend returns the created user object
       setCurrentUser(data.user);
-      localStorage.setItem('quizzlyUser', JSON.stringify(data.user));
+      localStorage.setItem("quizzlyUser", JSON.stringify(data.user));
       return data.user;
     } else {
-      throw new Error(data.error || 'Registration failed on server');
+      throw new Error(data.error || "Registration failed on server");
     }
   };
 
   // Login function: sends plaintext password to backend for verification
   const login = async (email, password) => {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    });
-    
+    const response = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/login`,
+      {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      }
+    );
+
     const data = await response.json();
     if (response.ok && data.success) {
       setCurrentUser(data.user);
-      localStorage.setItem('quizzlyUser', JSON.stringify(data.user));
+      localStorage.setItem("quizzlyUser", JSON.stringify(data.user));
       return data.user;
     } else {
-      throw new Error(data.error || 'Login failed on server');
+      throw new Error(data.error || "Login failed on server");
     }
   };
 
   const logout = async () => {
     // Clear local auth state
     setCurrentUser(null);
-    localStorage.removeItem('quizzlyUser');
+    localStorage.removeItem("quizzlyUser");
+    console.log("Current user: ", localStorage.getItem("quizzlyUser"));
   };
 
   const value = {
@@ -80,7 +87,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-    loading
+    loading,
   };
 
   return (

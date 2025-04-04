@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import './GameLobby.css';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import "./GameLobby.css";
 
 const GameLobby = () => {
   const { id: gameCode } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // State for game data
   const [players, setPlayers] = useState([]);
   const [hostInfo, setHostInfo] = useState({
-    name: 'Quiz Host',
-    avatar: '👨‍🏫'
+    name: "Quiz Host",
+    avatar: "👨‍🏫",
   });
   const [quizInfo, setQuizInfo] = useState({
-    title: 'Loading quiz...',
-    description: '',
+    title: "Loading quiz...",
+    description: "",
     questions: 0,
-    timeLimit: 30
+    timeLimit: 30,
   });
   const [countdown, setCountdown] = useState(null);
-  const [playerNickname, setPlayerNickname] = useState('');
+  const [playerNickname, setPlayerNickname] = useState("");
   const [quizId, setQuizId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,6 +29,8 @@ const GameLobby = () => {
     // Get quiz ID from navigation state
     const { quizId } = location.state || {};
     setQuizId(quizId);
+
+    const playerData = sessionStorage.getItem("quizzlyPlayer");
 
     // Load player info from session storage
     /*const storedPlayer = sessionStorage.getItem('quizzlyPlayer');
@@ -42,17 +44,19 @@ const GameLobby = () => {
       navigate('/join');
       return;
     }*/
-    
-    setPlayerNickname(playerData.nickname);
-    
+
+    setPlayerNickname(playerData);
+
     // Add current player to players list
-    setPlayers([{
-      id: Date.now(),
-      nickname: playerData.nickname,
-      avatar: '😎',
-      isReady: false,
-      isYou: true
-    }]);
+    setPlayers([
+      {
+        id: Date.now(),
+        nickname: playerData,
+        avatar: "😎",
+        isReady: false,
+        isYou: true,
+      },
+    ]);
 
     // Fetch quiz data if ID exists
     if (quizId) {
@@ -69,32 +73,34 @@ const GameLobby = () => {
   // Fetch quiz data from backend
   const fetchQuizData = async (quizId) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/quizzes/${quizId}`);
-      if (!response.ok) throw new Error('Failed to load quiz');
-      
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/quizzes/${quizId}`
+      );
+      if (!response.ok) throw new Error("Failed to load quiz");
+
       const data = await response.json();
       setQuizInfo({
-        title: data.title || 'Untitled Quiz',
-        description: data.description || '',
+        title: data.title || "Untitled Quiz",
+        description: data.description || "",
         questions: data.questions?.length || 0,
-        timeLimit: data.timeLimit || 30
+        timeLimit: data.timeLimit || 30,
       });
-      
+
       // Set host info from quiz data if available
       if (data.created_by) {
         setHostInfo({
           name: data.created_by,
-          avatar: '👨‍🏫'
+          avatar: "👨‍🏫",
         });
       }
     } catch (error) {
-      console.error('Error fetching quiz:', error);
+      console.error("Error fetching quiz:", error);
       // Fallback to mock data
       setQuizInfo({
-        title: 'General Knowledge Quiz',
-        description: 'Test your knowledge on various topics',
+        title: "General Knowledge Quiz",
+        description: "Test your knowledge on various topics",
         questions: 10,
-        timeLimit: 30
+        timeLimit: 30,
       });
     } finally {
       setIsLoading(false);
@@ -104,44 +110,66 @@ const GameLobby = () => {
   // Simulate player updates
   const updatePlayers = () => {
     if (countdown !== null) return; // Don't update during countdown
-    
+
     // Randomly add a player sometimes
     if (players.length < 8 && Math.random() > 0.6) {
-      const avatars = ['🦊', '🐱', '🐶', '🦁', '🐼', '🐯', '🦄', '🐢', '🦖', '🐬'];
-      const names = ['QuizKid', 'BrainPower', 'ThinkTank', 'MindMaster', 'QuizWizard', 'GameChamp', 'BrainStorm', 'TriviaAce'];
-      
+      const avatars = [
+        "🦊",
+        "🐱",
+        "🐶",
+        "🦁",
+        "🐼",
+        "🐯",
+        "🦄",
+        "🐢",
+        "🦖",
+        "🐬",
+      ];
+      const names = [
+        "QuizKid",
+        "BrainPower",
+        "ThinkTank",
+        "MindMaster",
+        "QuizWizard",
+        "GameChamp",
+        "BrainStorm",
+        "TriviaAce",
+      ];
+
       const newPlayer = {
         id: Date.now(),
-        nickname: names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 100),
+        nickname:
+          names[Math.floor(Math.random() * names.length)] +
+          Math.floor(Math.random() * 100),
         avatar: avatars[Math.floor(Math.random() * avatars.length)],
-        isReady: Math.random() > 0.3
+        isReady: Math.random() > 0.3,
       };
-      
-      setPlayers(prevPlayers => [...prevPlayers, newPlayer]);
+
+      setPlayers((prevPlayers) => [...prevPlayers, newPlayer]);
     }
-    
+
     // Toggle ready status for existing players
-    setPlayers(prevPlayers => 
-      prevPlayers.map(player => {
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) => {
         if (player.isYou) return player;
         if (Math.random() > 0.8) {
-          return {...player, isReady: !player.isReady};
+          return { ...player, isReady: !player.isReady };
         }
         return player;
       })
     );
-    
+
     // Simulate game starting after enough players
-    if (players.length >= 2 && players.every(p => p.isReady)) {
+    if (players.length >= 2 && players.every((p) => p.isReady)) {
       startCountdown();
     }
   };
-  
+
   const startCountdown = () => {
     setCountdown(5);
-    
+
     const timer = setInterval(() => {
-      setCountdown(prev => {
+      setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
           // Redirect to game with both gameCode and quizId
@@ -152,21 +180,21 @@ const GameLobby = () => {
       });
     }, 1000);
   };
-  
+
   const toggleReady = () => {
-    setPlayers(prevPlayers => 
-      prevPlayers.map(player => 
-        player.isYou ? {...player, isReady: !player.isReady} : player
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((player) =>
+        player.isYou ? { ...player, isReady: !player.isReady } : player
       )
     );
   };
-  
+
   const leaveGame = () => {
-    sessionStorage.removeItem('quizzlyPlayer');
-    navigate('/dashboard');
+    sessionStorage.removeItem("quizzlyPlayer");
+    navigate("/dashboard");
   };
-  
-  const currentPlayer = players.find(p => p.isYou) || {};
+
+  const currentPlayer = players.find((p) => p.isYou) || {};
 
   if (isLoading) {
     return (
@@ -188,18 +216,24 @@ const GameLobby = () => {
           </div>
         </div>
       )}
-      
+
       <div className="lobby-header">
         <div className="game-info">
           <h1>{quizInfo.title}</h1>
           <p className="game-description">{quizInfo.description}</p>
           <div className="game-meta">
-            <span className="game-code">Game Code: <strong>{gameCode}</strong></span>
-            <span className="question-count">{quizInfo.questions} Questions</span>
-            <span className="time-limit">{quizInfo.timeLimit}s per question</span>
+            <span className="game-code">
+              Game Code: <strong>{gameCode}</strong>
+            </span>
+            <span className="question-count">
+              {quizInfo.questions} Questions
+            </span>
+            <span className="time-limit">
+              {quizInfo.timeLimit}s per question
+            </span>
           </div>
         </div>
-        
+
         <div className="host-info">
           <div className="host-avatar">{hostInfo.avatar}</div>
           <div className="host-details">
@@ -208,59 +242,67 @@ const GameLobby = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="lobby-content">
         <div className="lobby-main">
           <h2>Players ({players.length})</h2>
           <p className="lobby-instruction">
-            {players.every(p => p.isReady) 
-              ? 'All players ready! Starting soon...' 
-              : 'Waiting for players to ready up...'}
+            {players.every((p) => p.isReady)
+              ? "All players ready! Starting soon..."
+              : "Waiting for players to ready up..."}
           </p>
-          
+
           <div className="players-grid">
-            {players.map(player => (
-              <div 
-                key={player.id} 
-                className={`player-card ${player.isReady ? 'ready' : 'not-ready'} ${player.isYou ? 'is-you' : ''}`}
+            {players.map((player) => (
+              <div
+                key={player.id}
+                className={`player-card ${
+                  player.isReady ? "ready" : "not-ready"
+                } ${player.isYou ? "is-you" : ""}`}
               >
                 <div className="player-avatar">{player.avatar}</div>
                 <div className="player-name">
-                  {player.nickname} {player.isYou && <span className="you-badge">(You)</span>}
+                  {player.nickname}{" "}
+                  {player.isYou && <span className="you-badge">(You)</span>}
                 </div>
                 <div className="player-status">
-                  {player.isReady ? 'Ready ✓' : 'Not Ready...'}
+                  {player.isReady ? "Ready ✓" : "Not Ready..."}
                 </div>
               </div>
             ))}
           </div>
         </div>
-        
+
         <div className="lobby-sidebar">
           <div className="player-info">
-            <div className="player-avatar large">{currentPlayer.avatar || '😎'}</div>
+            <div className="player-avatar large">
+              {currentPlayer.avatar || "😎"}
+            </div>
             <h3 className="player-name">{playerNickname}</h3>
-            <div className={`player-status-badge ${currentPlayer.isReady ? 'ready' : ''}`}>
-              {currentPlayer.isReady ? 'Ready to Play' : 'Not Ready'}
+            <div
+              className={`player-status-badge ${
+                currentPlayer.isReady ? "ready" : ""
+              }`}
+            >
+              {currentPlayer.isReady ? "Ready to Play" : "Not Ready"}
             </div>
           </div>
-          
+
           <div className="lobby-actions">
-            <button 
-              className={`btn ${currentPlayer.isReady ? 'btn-outline' : 'btn-primary'} btn-block`}
+            <button
+              className={`btn ${
+                currentPlayer.isReady ? "btn-outline" : "btn-primary"
+              } btn-block`}
               onClick={toggleReady}
             >
-              {currentPlayer.isReady ? 'Cancel Ready' : 'Ready Up'}
+              {currentPlayer.isReady ? "Cancel Ready" : "Ready Up"}
             </button>
-            
-            <button 
-              className="btn btn-outline btn-block"
-              onClick={leaveGame}
-            >
+
+            <button className="btn btn-outline btn-block" onClick={leaveGame}>
               Leave Game
             </button>
           </div>
-          
+
           <div className="lobby-rules">
             <h3>How to Play</h3>
             <ul>
