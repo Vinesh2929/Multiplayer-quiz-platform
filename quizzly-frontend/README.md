@@ -1,12 +1,40 @@
-# React + Vite
+# Real-Time Multiplayer Quiz Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web-based, real-time, multiplayer quiz platform inspired by Kahoot, built with a React (Vite) frontend and a C++ backend server using Boost.Beast and MongoDB.
 
-Currently, two official plugins are available:
+This project was developed as a final project for SE3313 (Software Engineering) at Western University.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- User account registration and login (with bcrypt password hashing)
+- Quiz creation, editing, and management
+- Hosting and joining live quiz sessions via lobby codes
+- Real-time gameplay using WebSocket communication
+- Dynamic score updates and live leaderboard
+- Concurrency management with C++ threads and mutexes
+- Persistent data storage with MongoDB
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Technology Stack
+
+- **Frontend:** React (Vite)
+- **Backend:** C++ (httplib, Boost.Beast, MongoDB C++ Driver)
+- **Database:** MongoDB
+- **Protocols:** HTTP (for API endpoints), WebSockets (for real-time multiplayer communication)
+
+## 💻 How to Run
+
+### Prerequisites
+
+- Node.js and npm
+- C++ compiler with C++17 support
+- MongoDB installed and running
+- Boost libraries installed
+- CMake (for C++ backend build)
+
+### Running the Frontend
+
+1. Navigate to the `frontend/` directory
+2. Install dependencies:
+
+```bash
+npm install
